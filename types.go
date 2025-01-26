@@ -7,6 +7,15 @@ type CardID struct {
 
 type CardType int
 type CardCategory int
+type Attribute int
+
+const (
+	Strike Attribute = iota
+	Slash
+	Ranged
+	Special
+	Wisdom
+)
 
 const (
 	Leader CardCategory = iota
@@ -20,6 +29,8 @@ const (
 	Egghead
 )
 
+var cardTypeMap map[CardType]string
+
 type CardColor int
 
 const (
@@ -31,59 +42,56 @@ const (
 	Yellow
 )
 
-type CardInfo struct {
-	ID       CardID
-	Types    []CardType
-	Category CardCategory
+type BaseCard struct {
+	ID     CardID
+	Types  []CardType
+	Colors []CardColor
 }
 
-type LeaderCardData struct {
-	ID        CardID
-	Power     int
-	Life      int
-	Attribute int
-	Colors    []CardColor
+type LeaderCard struct {
+	BaseCard
+	Power      int
+	Life       int
+	Attributes []Attribute
 }
 
-type CharacterCardData struct {
-	ID        CardID
-	Power     int
-	Cost      int
-	Attribute int
-	Color     []CardColor
-	//trigger?
+type CostedCard struct {
+	BaseCard
+	Cost    int
+	Trigger bool
 }
 
-type EventCardData struct {
-	ID    CardID
-	Cost  int
-	Color []CardColor
-	//trigger?
+type CharacterCard struct {
+	CostedCard
+	Power      int
+	Counter    int
+	Attributes []Attribute
 }
 
-type StageCardData struct {
-	ID    CardID
-	Cost  int
-	Color []CardColor
-	//trigger?
+type EventCard struct {
+	CostedCard
 }
 
-type LanguageSpecificCardData struct {
-	ID   CardID
-	Name string
-	Text string
-	//TriggerText string
-	imageUrl string //custom type to verify valid?
+type StageCard struct {
+	CostedCard
+}
+
+type CardText struct {
+	BaseCard
+	Name        string
+	Text        string
+	TriggerText string
+	ImageUrl    string
 }
 
 type CardArtVariant struct {
 	ReleaseSet string
 	ArtType    string
-	imageUrl   string //custom type to verify valid?
+	ImageUrl   string //custom type to verify valid?
 }
 
-type AltArtData struct { //mention of lang specific?
-	ID       CardID
+type AltArts struct { //mention of lang specific?
+	BaseCard
 	variants []CardArtVariant
 }
 
@@ -97,4 +105,4 @@ const (
 	Korean
 )
 
-var langMap map[LanguageID]LanguageSpecificCardData
+var langMap map[LanguageID]CardText
