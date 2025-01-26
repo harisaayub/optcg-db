@@ -1,4 +1,4 @@
-package main
+package optcgdb
 
 type CardID struct {
 	Set    string
@@ -7,10 +7,10 @@ type CardID struct {
 
 type CardType int
 type CardCategory int
-type Attribute int
+type CardAttribute int
 
 const (
-	Strike Attribute = iota
+	Strike CardAttribute = iota
 	Slash
 	Ranged
 	Special
@@ -27,9 +27,10 @@ const (
 const (
 	StrawHatCrew CardType = iota
 	Egghead
+	CP0
 )
 
-var cardTypeMap map[CardType]string
+var cardTypeMap map[CardType]string = make(map[CardType]string)
 
 type CardColor int
 
@@ -48,11 +49,15 @@ type BaseCard struct {
 	Colors []CardColor
 }
 
+type Card interface {
+	//implement some functions for all card types
+}
+
 type LeaderCard struct {
 	BaseCard
 	Power      int
 	Life       int
-	Attributes []Attribute
+	Attributes []CardAttribute
 }
 
 type CostedCard struct {
@@ -65,7 +70,7 @@ type CharacterCard struct {
 	CostedCard
 	Power      int
 	Counter    int
-	Attributes []Attribute
+	Attributes []CardAttribute
 }
 
 type EventCard struct {
@@ -78,6 +83,7 @@ type StageCard struct {
 
 type CardText struct {
 	BaseCard
+	Language    LanguageID
 	Name        string
 	Text        string
 	TriggerText string
@@ -85,14 +91,15 @@ type CardText struct {
 }
 
 type CardArtVariant struct {
-	ReleaseSet string
-	ArtType    string
-	ImageUrl   string //custom type to verify valid?
+	ReleaseSet   string
+	ArtType      string
+	ImageUrl     string //custom type to verify valid?
+	TcgPlayerUrl string
 }
 
-type AltArts struct { //mention of lang specific?
-	BaseCard
-	variants []CardArtVariant
+type AltArts struct {
+	CardText
+	Variants []CardArtVariant
 }
 
 type LanguageID int
@@ -105,4 +112,4 @@ const (
 	Korean
 )
 
-var langMap map[LanguageID]CardText
+var langMap map[LanguageID]CardText = make(map[LanguageID]CardText)
