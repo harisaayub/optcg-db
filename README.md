@@ -1,1 +1,1 @@
-OPTCG bot
+OPTCG DB
