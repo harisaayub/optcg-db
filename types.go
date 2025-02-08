@@ -50,7 +50,7 @@ type BaseCard struct {
 }
 
 type Card interface {
-	//implement some functions for all card types
+	GetBaseCard()
 }
 
 type LeaderCard struct {
@@ -61,24 +61,27 @@ type LeaderCard struct {
 }
 
 type CostedCard struct {
-	BaseCard
-	Cost    int
-	Trigger bool
 }
 
 type CharacterCard struct {
-	CostedCard
+	BaseCard
+	Cost       int
+	Trigger    bool
 	Power      int
 	Counter    int
 	Attributes []CardAttribute
 }
 
 type EventCard struct {
-	CostedCard
+	BaseCard
+	Cost    int
+	Trigger bool
 }
 
 type StageCard struct {
-	CostedCard
+	BaseCard
+	Cost    int
+	Trigger bool
 }
 
 type CardText struct {
