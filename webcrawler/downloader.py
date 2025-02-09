@@ -32,7 +32,7 @@ def scrape_by_color():
         color_dict = scrape(result_col)
         # easiest way i could think of doing a uniqueness check
         # if the card has a color we already parsed, don't add it again
-        print(color_dict)
+        # print(color_dict)
         for card in color_dict:
             if not any(color in all_colors[:i] for color in card["colors"]):
                 all_cards.append(card)
@@ -68,7 +68,7 @@ def scrape(result_col):
         child_json['card_id'] = setid
         child_json['rarity'] = rarity
         child_json['card_type'] = cardtype
-        child_json['name'] = name[0].get_attribute("innerHTML").replace('&amp;', '&')
+        child_json['name'] = name[0].get_attribute("innerHTML")
         if cardtype == "LEADER":
             child_json['life'] = cost[0].get_attribute("innerHTML").split('>')[-1]
             if '_' in img:
@@ -80,12 +80,12 @@ def scrape(result_col):
         child_json['counter'] = counter[0].get_attribute("innerHTML").split('>')[-1]
         child_json['colors'] = color[0].get_attribute("innerHTML").split('>')[-1].split('/')
         child_json['types'] = feature[0].get_attribute("innerHTML").split('>')[-1].split('/')
-        child_json['text'] = text[0].get_attribute("innerHTML")[15:].replace('<br>', '\n').replace('\u2013', '-').replace('\u2212', '-')
+        child_json['text'] = text[0].get_attribute("innerHTML")[15:]
         child_json['art_set'] = getInfo[0].get_attribute("innerHTML")[20:]
         child_json['image_url'] = img
         child_json['trigger'] = '-'
         if trigger:
-            child_json['trigger'] = trigger[0].get_attribute("innerHTML")[16:].replace('<br>', '\n').replace('\u2013', '-').replace('\u2212', '-')
+            child_json['trigger'] = trigger[0].get_attribute("innerHTML")[16:]
         result.append(child_json)
     return result
 
