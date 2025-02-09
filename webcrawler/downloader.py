@@ -1,20 +1,44 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import re
 import pprint
 import json
+BASE_URL = "https://en.onepiece-cardgame.com/cardlist/"
 
 def remove_html_tags(text):
     """Remove all HTML tags from a string."""
     clean_text = re.sub(r'<.*?>', '', text)  # Match anything between < and > and remove
     return clean_text
 
-def drive(url):
+def scrape_by_color():
+    # using js arguments[0].click() to click hidden buttons, selenium gets upset when out of view
     driver = webdriver.Chrome()
-    driver.get(url)
-    result_col = driver.find_element(By.CLASS_NAME, "resultCol")
+    driver.get(BASE_URL)
+    all_colors = ['Red', 'Green', 'Blue', 'Purple', 'Black', 'Yellow']
+    wait = WebDriverWait(driver, 10)
+    all_cards = []
+    all_button = driver.find_element(By.XPATH, "//li[text()='ALL']")
+    driver.execute_script("arguments[0].click();", all_button)
+    for i, color in enumerate(all_colors):
+        color_btn = driver.find_element(By.ID, f"color_{color}")
+        driver.execute_script("arguments[0].click();", color_btn) # select color
+        submit_btn = driver.find_element(By.CSS_SELECTOR, 'div.commonBtn.submitBtn input[type="submit"]')
+        submit_btn.click() # search and then wait until loads
+        result_col = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "resultCol")))
+        color_btn = driver.find_element(By.ID, f"color_{color}") # selenium complains about the first button becoming stale
+        driver.execute_script("arguments[0].click();", color_btn) # unselect color
+        color_dict = scrape(result_col)
+        # easiest way i could think of doing a uniqueness check
+        # if the card has a color we already parsed, don't add it again
+        print(color_dict)
+        for card in color_dict:
+            if not any(color in all_colors[:i] for color in card["colors"]):
+                all_cards.append(card)
+    return all_cards
+
+def scrape(result_col):
     children = result_col.find_elements(By.XPATH, "./dl")
     result = []
     for child in children:
@@ -57,7 +81,7 @@ def drive(url):
         child_json['colors'] = color[0].get_attribute("innerHTML").split('>')[-1].split('/')
         child_json['types'] = feature[0].get_attribute("innerHTML").split('>')[-1].split('/')
         child_json['text'] = text[0].get_attribute("innerHTML")[15:].replace('<br>', '\n').replace('\u2013', '-').replace('\u2212', '-')
-        child_json['art_set'] = getInfo[0].get_attribute("innerHTML").split('[')[-1][:-1]
+        child_json['art_set'] = getInfo[0].get_attribute("innerHTML")[20:]
         child_json['image_url'] = img
         child_json['trigger'] = '-'
         if trigger:
@@ -65,7 +89,7 @@ def drive(url):
         result.append(child_json)
     return result
 
-card_dict = drive("https://en.onepiece-cardgame.com/cardlist/")
+card_dict = scrape_by_color()
 #pprint.pprint(card_dict[:10], indent=2)
 with open('card_list.json', 'w') as outfile:
     json.dump(card_dict, outfile, indent=2)
