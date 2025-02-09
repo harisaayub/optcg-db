@@ -55,7 +55,7 @@ def drive(url):
         child_json['counter'] = counter[0].get_attribute("innerHTML").split('>')[-1]
         child_json['colors'] = color[0].get_attribute("innerHTML").split('>')[-1].split('/')
         child_json['types'] = feature[0].get_attribute("innerHTML").split('>')[-1].split('/')
-        child_json['text'] = text[0].get_attribute("innerHTML")[15:].replace('<br>', '\n')
+        child_json['text'] = text[0].get_attribute("innerHTML")[15:].replace('<br>', '\n').replace('\u2013', '-').replace('\u2212', '-')
         child_json['art_set'] = getInfo[0].get_attribute("innerHTML").split('[')[-1][:-1]
         child_json['image_url'] = img
         result.append(child_json)

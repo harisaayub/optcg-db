@@ -73,7 +73,7 @@
       "The Four Emperors",
       "Straw Hat Crew"
     ],
-    "text": "[On Play] DON!! \u221210: Place all of your Characters except this Character at the bottom of your deck in any order. Then, take an extra turn after this one.\n[Activate: Main] [Once Per Turn] You may rest 1 of your DON!! cards: Add up to 1 DON!! card from your DON!! deck and set it as active.",
+    "text": "[On Play] DON!! -10: Place all of your Characters except this Character at the bottom of your deck in any order. Then, take an extra turn after this one.\n[Activate: Main] [Once Per Turn] You may rest 1 of your DON!! cards: Add up to 1 DON!! card from your DON!! deck and set it as active.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP05-119_p6.png?241220"
   },
@@ -152,7 +152,7 @@
       "The Four Emperors",
       "Red-Haired Pirates"
     ],
-    "text": "[Once Per Turn] This effect can be activated when your opponent attacks. Give up to 1 of your opponent's Leader or Character cards \u22121000 power during this turn.",
+    "text": "[Once Per Turn] This effect can be activated when your opponent attacks. Give up to 1 of your opponent's Leader or Character cards -1000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-001.png?241220"
   },
@@ -172,7 +172,7 @@
       "The Four Emperors",
       "Red-Haired Pirates"
     ],
-    "text": "[Once Per Turn] This effect can be activated when your opponent attacks. Give up to 1 of your opponent's Leader or Character cards \u22121000 power during this turn.",
+    "text": "[Once Per Turn] This effect can be activated when your opponent attacks. Give up to 1 of your opponent's Leader or Character cards -1000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-001_p1.png?241220"
   },
@@ -229,7 +229,7 @@
     "types": [
       "Heart Pirates"
     ],
-    "text": "[When Attacking] Give up to 1 of your opponent's Characters \u22122000 power during this turn.",
+    "text": "[When Attacking] Give up to 1 of your opponent's Characters -2000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-003.png?241220"
   },
@@ -249,7 +249,7 @@
       "The Four Emperors",
       "Red-Haired Pirates"
     ],
-    "text": "Give all of your opponent's Characters \u22121000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
+    "text": "Give all of your opponent's Characters -1000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-004.png?241220"
   },
@@ -269,7 +269,7 @@
       "The Four Emperors",
       "Red-Haired Pirates"
     ],
-    "text": "Give all of your opponent's Characters \u22121000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
+    "text": "Give all of your opponent's Characters -1000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-004_p1.png?241220"
   },
@@ -289,7 +289,7 @@
       "The Four Emperors",
       "Red-Haired Pirates"
     ],
-    "text": "Give all of your opponent's Characters \u22121000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
+    "text": "Give all of your opponent's Characters -1000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-004_p2.png?241220"
   },
@@ -309,7 +309,7 @@
       "The Four Emperors",
       "Red-Haired Pirates"
     ],
-    "text": "Give all of your opponent's Characters \u22121000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
+    "text": "Give all of your opponent's Characters -1000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-004_p3.png?241220"
   },
@@ -385,7 +385,7 @@
     "types": [
       "Red-Haired Pirates"
     ],
-    "text": "[Activate: Main] You may place this Character at the bottom of the owner's deck: Give up to 1 of your opponent's Characters \u22123000 power during this turn.",
+    "text": "[Activate: Main] You may place this Character at the bottom of the owner's deck: Give up to 1 of your opponent's Characters -3000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-008.png?241220"
   },
@@ -461,7 +461,7 @@
     "types": [
       "Red-Haired Pirates"
     ],
-    "text": "[Activate: Main] You may rest this Character: If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters \u22122000 power during this turn.",
+    "text": "[Activate: Main] You may rest this Character: If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters -2000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-011.png?241220"
   },
@@ -500,7 +500,7 @@
     "types": [
       "Red-Haired Pirates"
     ],
-    "text": "[On Play] Up to 1 of your Leader gains +1000 power until the end of your opponent's next turn.\n[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters \u22121000 power during this turn.",
+    "text": "[On Play] Up to 1 of your Leader gains +1000 power until the end of your opponent's next turn.\n[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters -1000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-013.png?241220"
   },
@@ -614,7 +614,7 @@
     "types": [
       "Red-Haired Pirates"
     ],
-    "text": "[Main] If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters \u22123000 power during this turn. Then, if your opponent has a Character with 5000 or more power, draw 1 card.",
+    "text": "[Main] If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters -3000 power during this turn. Then, if your opponent has a Character with 5000 or more power, draw 1 card.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-019.png?241220"
   },
@@ -653,7 +653,7 @@
     "types": [
       "Red-Haired Pirates"
     ],
-    "text": "[Activate: Main] You may rest this Stage: If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters \u22121000 power during this turn.",
+    "text": "[Activate: Main] You may rest this Stage: If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters -1000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-021.png?241220"
   },
@@ -1764,7 +1764,7 @@
     "types": [
       "Kid Pirates"
     ],
-    "text": "[On Play] DON!! \u22121 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Set up to 1 of your {Kid Pirates} type Leader as active.",
+    "text": "[On Play] DON!! -1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Set up to 1 of your {Kid Pirates} type Leader as active.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-064.png?241220"
   },
@@ -1956,7 +1956,7 @@
     "types": [
       "Straw Hat Crew"
     ],
-    "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] DON!! \u22122, You may trash 1 card from your hand: Draw 2 cards.",
+    "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] DON!! -2, You may trash 1 card from your hand: Draw 2 cards.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-072.png?241220"
   },
@@ -1975,7 +1975,7 @@
     "types": [
       "Straw Hat Crew"
     ],
-    "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] DON!! \u22122, You may trash 1 card from your hand: Draw 2 cards.",
+    "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] DON!! -2, You may trash 1 card from your hand: Draw 2 cards.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-072_p1.png?241220"
   },
@@ -1994,7 +1994,7 @@
     "types": [
       "Straw Hat Crew"
     ],
-    "text": "[When Attacking] You may return 1 or more DON!! cards from your field to your DON!! deck: Give up to 2 of your opponent's Characters \u22122000 power during this turn.",
+    "text": "[When Attacking] You may return 1 or more DON!! cards from your field to your DON!! deck: Give up to 2 of your opponent's Characters -2000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-073.png?241220"
   },
@@ -2072,7 +2072,7 @@
       "The Four Emperors",
       "Straw Hat Crew"
     ],
-    "text": "[Main] DON!! \u22122 (You may return the specified number of DON!! cards from your field to your DON!! deck.): K.O. up to 1 of your opponent's Characters with 6000 power or less.",
+    "text": "[Main] DON!! -2 (You may return the specified number of DON!! cards from your field to your DON!! deck.): K.O. up to 1 of your opponent's Characters with 6000 power or less.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-077.png?241220"
   },
@@ -2092,7 +2092,7 @@
       "The Four Emperors",
       "Straw Hat Crew"
     ],
-    "text": "[Counter] DON!! \u22122, You may trash 1 card from your hand: If your Leader has the {Straw Hat Crew} type, up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, draw 2 cards.",
+    "text": "[Counter] DON!! -2, You may trash 1 card from your hand: If your Leader has the {Straw Hat Crew} type, up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, draw 2 cards.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-078.png?241220"
   },
@@ -2112,7 +2112,7 @@
       "The Four Emperors",
       "Straw Hat Crew"
     ],
-    "text": "[Main] DON!! \u22122 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Rest up to 1 of your opponent's Characters with a cost of 5 or less. Then, draw 1 card.",
+    "text": "[Main] DON!! -2 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Rest up to 1 of your opponent's Characters with a cost of 5 or less. Then, draw 1 card.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-079.png?241220"
   },
@@ -2209,7 +2209,7 @@
     "types": [
       "Blackbeard Pirates"
     ],
-    "text": "[Activate: Main] You may rest this Character: If your Leader has the {Blackbeard Pirates} type, give up to 1 of your opponent's Characters \u22123 cost during this turn.\n[On K.O.] Draw 1 card.",
+    "text": "[Activate: Main] You may rest this Character: If your Leader has the {Blackbeard Pirates} type, give up to 1 of your opponent's Characters -3 cost during this turn.\n[On K.O.] Draw 1 card.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-083.png?241220"
   },
@@ -2324,7 +2324,7 @@
       "Animal",
       "Blackbeard Pirates"
     ],
-    "text": "[Activate: Main] You may trash 1 card from your hand and trash this Character: If your Leader has the {Blackbeard Pirates} type, draw 1 card. Then, give up to 1 of your opponent's Characters \u20132 cost during this turn.",
+    "text": "[Activate: Main] You may trash 1 card from your hand and trash this Character: If your Leader has the {Blackbeard Pirates} type, draw 1 card. Then, give up to 1 of your opponent's Characters -2 cost during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-089.png?241220"
   },
@@ -2538,7 +2538,7 @@
     "types": [
       "Blackbeard Pirates"
     ],
-    "text": "[Counter] Negate the effect of up to 1 of your opponent's Leader or Character cards and give that card \u22124000 power during this turn.",
+    "text": "[Counter] Negate the effect of up to 1 of your opponent's Leader or Character cards and give that card -4000 power during this turn.",
     "art_set": "OP-09",
     "image_url": "../images/cardlist/card/OP09-097.png?241220"
   },
