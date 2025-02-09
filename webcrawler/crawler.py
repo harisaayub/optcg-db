@@ -11,10 +11,18 @@ class Prices:
         return f"Last Sold: {self.last_sold}\nLowest Verified: {self.lowest_verified}"
 
 def getPrices(url: str) -> Prices:
-    driver = webdriver.Chrome()
+
+    options = webdriver.ChromeOptions()
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--headless=new")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+    driver = webdriver.Chrome(options=options)
     driver.get(url)
-    element = driver.find_element(By.CLASS_NAME, "spotlight__price")
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_element_located((By.TAG_NAME, "script")))
     # click into more info and pull last sold data
+    print(driver.page_source)
     return Prices([], [])
 
 
