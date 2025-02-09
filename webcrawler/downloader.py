@@ -30,6 +30,7 @@ def drive(url):
         text = child.find_elements(By.CSS_SELECTOR, ".text")
         getInfo = child.find_elements(By.CSS_SELECTOR, ".getInfo")
         lazy = child.find_elements(By.CSS_SELECTOR, ".lazy")
+        trigger = child.find_elements(By.CSS_SELECTOR, ".trigger")
 
         setid, rarity, cardtype = infoCol[0].get_attribute("innerHTML").strip().split('|')
         setid = remove_html_tags(setid).strip()
@@ -43,7 +44,7 @@ def drive(url):
         child_json['card_id'] = setid
         child_json['rarity'] = rarity
         child_json['card_type'] = cardtype
-        child_json['name'] = name[0].get_attribute("innerHTML")
+        child_json['name'] = name[0].get_attribute("innerHTML").replace('&amp;', '&')
         if cardtype == "LEADER":
             child_json['life'] = cost[0].get_attribute("innerHTML").split('>')[-1]
             if '_' in img:
@@ -58,10 +59,13 @@ def drive(url):
         child_json['text'] = text[0].get_attribute("innerHTML")[15:].replace('<br>', '\n').replace('\u2013', '-').replace('\u2212', '-')
         child_json['art_set'] = getInfo[0].get_attribute("innerHTML").split('[')[-1][:-1]
         child_json['image_url'] = img
+        child_json['trigger'] = '-'
+        if trigger:
+            child_json['trigger'] = trigger[0].get_attribute("innerHTML")[16:].replace('<br>', '\n').replace('\u2013', '-').replace('\u2212', '-')
         result.append(child_json)
     return result
 
 card_dict = drive("https://en.onepiece-cardgame.com/cardlist/")
-pprint.pprint(card_dict[:10], indent=2)
+#pprint.pprint(card_dict[:10], indent=2)
 with open('card_list.json', 'w') as outfile:
     json.dump(card_dict, outfile, indent=2)

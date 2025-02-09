@@ -17,7 +17,8 @@
     ],
     "text": "[Opponent's Turn] If this Character is rested, your active Characters with a base cost of 5 cannot be K.O.'d by effects.\n[On Play] You may rest this Character: Play up to 1 green Character card with a cost of 5 from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP04-119_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP04-119_p2.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP05-067",
@@ -36,7 +37,8 @@
     ],
     "text": "[When Attacking] If you have 3 or less Life cards, add up to 1 DON!! card from your DON!! deck and set it as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP05-067_p4.png?241220"
+    "image_url": "../images/cardlist/card/OP05-067_p4.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP05-093",
@@ -55,7 +57,8 @@
     ],
     "text": "[On Play] You may place 3 cards from your trash at the bottom of your deck in any order: K.O. up to 1 of your opponent's Characters with a cost of 2 or less and up to 1 of your opponent's Characters with a cost of 1 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP05-093_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP05-093_p2.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP05-119",
@@ -75,7 +78,8 @@
     ],
     "text": "[On Play] DON!! -10: Place all of your Characters except this Character at the bottom of your deck in any order. Then, take an extra turn after this one.\n[Activate: Main] [Once Per Turn] You may rest 1 of your DON!! cards: Add up to 1 DON!! card from your DON!! deck and set it as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP05-119_p6.png?241220"
+    "image_url": "../images/cardlist/card/OP05-119_p6.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP07-015",
@@ -94,7 +98,8 @@
     ],
     "text": "[Rush] (This card can attack on the turn in which it is played.)\n[On Play] Give up to 2 rested DON!! cards to your Leader or 1 of your Characters.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP07-015_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP07-015_p2.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP07-051",
@@ -114,7 +119,8 @@
     ],
     "text": "[On Play] Up to 1 of your opponent's Characters other than [Monkey.D.Luffy] cannot attack until the end of your opponent's next turn. Then, place up to 1 Character with a cost of 1 or less at the bottom of the owner's deck.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP07-051_p3.png?241220"
+    "image_url": "../images/cardlist/card/OP07-051_p3.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP08-106",
@@ -134,7 +140,8 @@
     ],
     "text": "[On Play] You may trash 1 card with a [Trigger] from your hand: K.O. up to 1 of your opponent's Characters with a cost of 5 or less. Then, if you have 3 or less cards in your hand, draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP08-106_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP08-106_p2.png?241220",
+    "trigger": "[Trigger] Activate this card's [On Play] effect."
   },
   {
     "card_id": "OP09-001",
@@ -154,7 +161,8 @@
     ],
     "text": "[Once Per Turn] This effect can be activated when your opponent attacks. Give up to 1 of your opponent's Leader or Character cards -1000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-001.png?241220"
+    "image_url": "../images/cardlist/card/OP09-001.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-001",
@@ -174,7 +182,8 @@
     ],
     "text": "[Once Per Turn] This effect can be activated when your opponent attacks. Give up to 1 of your opponent's Leader or Character cards -1000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-001_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-001_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-002",
@@ -193,7 +202,8 @@
     ],
     "text": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {Red-Haired Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-002.png?241220"
+    "image_url": "../images/cardlist/card/OP09-002.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-002",
@@ -212,13 +222,14 @@
     ],
     "text": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {Red-Haired Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-002_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-002_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-003",
     "rarity": "C",
     "card_type": "CHARACTER",
-    "name": "Shachi &amp; Penguin",
+    "name": "Shachi & Penguin",
     "cost": "4",
     "attribute": "Ranged",
     "power": "5000",
@@ -231,7 +242,8 @@
     ],
     "text": "[When Attacking] Give up to 1 of your opponent's Characters -2000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-003.png?241220"
+    "image_url": "../images/cardlist/card/OP09-003.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-004",
@@ -251,7 +263,8 @@
     ],
     "text": "Give all of your opponent's Characters -1000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-004.png?241220"
+    "image_url": "../images/cardlist/card/OP09-004.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-004",
@@ -271,7 +284,8 @@
     ],
     "text": "Give all of your opponent's Characters -1000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-004_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-004_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-004",
@@ -291,7 +305,8 @@
     ],
     "text": "Give all of your opponent's Characters -1000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-004_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP09-004_p2.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-004",
@@ -311,7 +326,8 @@
     ],
     "text": "Give all of your opponent's Characters -1000 power.\n[Rush] (This card can attack on the turn in which it is played.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-004_p3.png?241220"
+    "image_url": "../images/cardlist/card/OP09-004_p3.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-005",
@@ -330,7 +346,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] If your opponent has 2 or more Characters with a base power of 5000 or more, draw 2 cards and trash 1 card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-005.png?241220"
+    "image_url": "../images/cardlist/card/OP09-005.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-006",
@@ -349,7 +366,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-006.png?241220"
+    "image_url": "../images/cardlist/card/OP09-006.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-007",
@@ -368,7 +386,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] Up to 1 of your Leader with 4000 power or less gains +1000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-007.png?241220"
+    "image_url": "../images/cardlist/card/OP09-007.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-008",
@@ -387,7 +406,8 @@
     ],
     "text": "[Activate: Main] You may place this Character at the bottom of the owner's deck: Give up to 1 of your opponent's Characters -3000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-008.png?241220"
+    "image_url": "../images/cardlist/card/OP09-008.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-009",
@@ -406,7 +426,8 @@
     ],
     "text": "[On Play] Trash up to 1 of your opponent's Characters with 6000 power or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-009.png?241220"
+    "image_url": "../images/cardlist/card/OP09-009.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-009",
@@ -425,7 +446,8 @@
     ],
     "text": "[On Play] Trash up to 1 of your opponent's Characters with 6000 power or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-009_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-009_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-010",
@@ -444,7 +466,8 @@
     ],
     "text": "[On Play] Play up to 1 [Monster] from your hand.\n[DON!! x1] [When Attacking] This Character gains +2000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-010.png?241220"
+    "image_url": "../images/cardlist/card/OP09-010.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-011",
@@ -463,7 +486,8 @@
     ],
     "text": "[Activate: Main] You may rest this Character: If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters -2000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-011.png?241220"
+    "image_url": "../images/cardlist/card/OP09-011.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-012",
@@ -483,7 +507,8 @@
     ],
     "text": "If your Character [Bonk Punch] would be K.O.'d by an effect, you may trash this Character instead.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-012.png?241220"
+    "image_url": "../images/cardlist/card/OP09-012.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-013",
@@ -502,7 +527,8 @@
     ],
     "text": "[On Play] Up to 1 of your Leader gains +1000 power until the end of your opponent's next turn.\n[DON!! x1] [When Attacking] Give up to 1 of your opponent's Characters -1000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-013.png?241220"
+    "image_url": "../images/cardlist/card/OP09-013.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-014",
@@ -521,7 +547,8 @@
     ],
     "text": "[On Play] Your opponent cannot activate up to 1 [Blocker] Character that has 4000 power or less during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-014.png?241220"
+    "image_url": "../images/cardlist/card/OP09-014.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-015",
@@ -540,7 +567,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On K.O.] If your Leader has the {Red-Haired Pirates} type, K.O. up to 1 of your opponent's Characters with a base power of 6000 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-015.png?241220"
+    "image_url": "../images/cardlist/card/OP09-015.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-016",
@@ -559,7 +587,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-016.png?241220"
+    "image_url": "../images/cardlist/card/OP09-016.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-017",
@@ -578,7 +607,8 @@
     ],
     "text": "[DON!! x1] If your Leader has 7000 power or more and the {Kid Pirates} type, this Character gains [Rush].",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-017.png?241220"
+    "image_url": "../images/cardlist/card/OP09-017.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-018",
@@ -597,7 +627,8 @@
     ],
     "text": "[Main] K.O. up to 2 of your opponent's Characters with a total power of 4000 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-018.png?241220"
+    "image_url": "../images/cardlist/card/OP09-018.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-019",
@@ -616,7 +647,8 @@
     ],
     "text": "[Main] If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters -3000 power during this turn. Then, if your opponent has a Character with 5000 or more power, draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-019.png?241220"
+    "image_url": "../images/cardlist/card/OP09-019.png?241220",
+    "trigger": "[Trigger] Draw 1 card."
   },
   {
     "card_id": "OP09-020",
@@ -636,7 +668,8 @@
     ],
     "text": "[Main] Look at 5 cards from the top of your deck; reveal up to 1 {Red-Haired Pirates} type card other than [Come On!! We'll Fight You!!] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-020.png?241220"
+    "image_url": "../images/cardlist/card/OP09-020.png?241220",
+    "trigger": "[Trigger] Draw 1 card."
   },
   {
     "card_id": "OP09-021",
@@ -655,7 +688,8 @@
     ],
     "text": "[Activate: Main] You may rest this Stage: If your Leader has the {Red-Haired Pirates} type, give up to 1 of your opponent's Characters -1000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-021.png?241220"
+    "image_url": "../images/cardlist/card/OP09-021.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-022",
@@ -675,7 +709,8 @@
     ],
     "text": "Your Character cards are played rested.\n[Activate: Main] [Once Per Turn] You may rest 3 of your DON!! cards: Add up to 1 DON!! card from your DON!! deck and rest it, and play up to 1 {ODYSSEY} type Character card with a cost of 5 or less from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-022.png?241220"
+    "image_url": "../images/cardlist/card/OP09-022.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-022",
@@ -695,7 +730,8 @@
     ],
     "text": "Your Character cards are played rested.\n[Activate: Main] [Once Per Turn] You may rest 3 of your DON!! cards: Add up to 1 DON!! card from your DON!! deck and rest it, and play up to 1 {ODYSSEY} type Character card with a cost of 5 or less from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-022_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-022_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-023",
@@ -714,7 +750,8 @@
     ],
     "text": "[On Play] If your Leader has the {ODYSSEY} type, set up to 3 of your DON!! cards as active.\n[On Your Opponent's Attack] [Once Per Turn] You may rest 1 of your DON!! cards: Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-023.png?241220"
+    "image_url": "../images/cardlist/card/OP09-023.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-023",
@@ -733,7 +770,8 @@
     ],
     "text": "[On Play] If your Leader has the {ODYSSEY} type, set up to 3 of your DON!! cards as active.\n[On Your Opponent's Attack] [Once Per Turn] You may rest 1 of your DON!! cards: Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-023_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-023_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-024",
@@ -753,7 +791,8 @@
     ],
     "text": "[On Play] If you have 2 or more rested Characters, draw 2 cards and trash 2 cards from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-024.png?241220"
+    "image_url": "../images/cardlist/card/OP09-024.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-025",
@@ -774,7 +813,8 @@
     ],
     "text": "If your Leader has the {ODYSSEY} type, this Character cannot be K.O.'d in battle by Leaders.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-025.png?241220"
+    "image_url": "../images/cardlist/card/OP09-025.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-026",
@@ -794,7 +834,8 @@
     ],
     "text": "[On Play] If you have 2 or more rested Characters, K.O. up to 1 of your opponent's Characters with a cost of 5 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-026.png?241220"
+    "image_url": "../images/cardlist/card/OP09-026.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-027",
@@ -814,7 +855,8 @@
     ],
     "text": "[When Attacking] [Once Per Turn] If you have 3 or more rested Characters, draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-027.png?241220"
+    "image_url": "../images/cardlist/card/OP09-027.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-028",
@@ -834,7 +876,8 @@
     ],
     "text": "[On K.O.] You may add 1 card from the top or bottom of your Life cards to your hand: Play up to 1 {ODYSSEY} or {Straw Hat Crew} type Character card with a cost of 4 or less from your trash rested.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-028.png?241220"
+    "image_url": "../images/cardlist/card/OP09-028.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-029",
@@ -855,7 +898,8 @@
     ],
     "text": "[End of Your Turn] Set up to 1 of your {ODYSSEY} type Characters with a cost of 4 or less as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-029.png?241220"
+    "image_url": "../images/cardlist/card/OP09-029.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-030",
@@ -876,7 +920,8 @@
     ],
     "text": "[On Play] You may return 1 of your Characters to the owner's hand: Play up to 1 {ODYSSEY} type Character card with a cost of 3 or less other than [Trafalgar Law] from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-030.png?241220"
+    "image_url": "../images/cardlist/card/OP09-030.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-031",
@@ -897,7 +942,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[End of Your Turn] If you have 2 or more rested Characters, set this Character as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-031.png?241220"
+    "image_url": "../images/cardlist/card/OP09-031.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-032",
@@ -918,7 +964,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Your Opponent's Attack] [Once Per Turn] Set this Character as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-032.png?241220"
+    "image_url": "../images/cardlist/card/OP09-032.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-033",
@@ -938,7 +985,8 @@
     ],
     "text": "[On Play] If you have 2 or more rested Characters, none of your {ODYSSEY} or {Straw Hat Crew} type Characters can be K.O.'d by effects until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-033.png?241220"
+    "image_url": "../images/cardlist/card/OP09-033.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-034",
@@ -958,7 +1006,8 @@
     ],
     "text": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Dracule Mihawk] or {Thriller Bark Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order and trash 1 card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-034.png?241220"
+    "image_url": "../images/cardlist/card/OP09-034.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-034",
@@ -978,7 +1027,8 @@
     ],
     "text": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Dracule Mihawk] or {Thriller Bark Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order and trash 1 card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-034_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-034_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-035",
@@ -998,7 +1048,8 @@
     ],
     "text": "[On Play] If you have 2 or more rested Characters, rest up to 1 of your opponent's Characters with a cost of 5 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-035.png?241220"
+    "image_url": "../images/cardlist/card/OP09-035.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-036",
@@ -1019,7 +1070,8 @@
     ],
     "text": "[On Play] If you have 2 or more rested Characters, rest up to 1 of your opponent's DON!! cards or Characters with a cost of 6 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-036.png?241220"
+    "image_url": "../images/cardlist/card/OP09-036.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-037",
@@ -1038,7 +1090,8 @@
     ],
     "text": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {ODYSSEY} type card other than [Lim] and add it to your hand. Then, place the rest at the bottom of your deck in any order.\n[End of Your Turn] If you have 3 or more rested Characters, set this Character as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-037.png?241220"
+    "image_url": "../images/cardlist/card/OP09-037.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-037",
@@ -1057,7 +1110,8 @@
     ],
     "text": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {ODYSSEY} type card other than [Lim] and add it to your hand. Then, place the rest at the bottom of your deck in any order.\n[End of Your Turn] If you have 3 or more rested Characters, set this Character as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-037_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-037_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-038",
@@ -1077,7 +1131,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-038.png?241220"
+    "image_url": "../images/cardlist/card/OP09-038.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-039",
@@ -1098,7 +1153,8 @@
     ],
     "text": "[Counter] If your Leader has the {ODYSSEY} type and you have 2 or more rested Characters, up to 1 of your Leader or Character cards gains +2000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-039.png?241220"
+    "image_url": "../images/cardlist/card/OP09-039.png?241220",
+    "trigger": "[Trigger] K.O. up to 1 of your opponent's rested Characters with a cost of 4 or less."
   },
   {
     "card_id": "OP09-040",
@@ -1119,7 +1175,8 @@
     ],
     "text": "[Main] If you have 2 or more rested Characters, K.O. up to 1 of your opponent's Characters with a cost of 4 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-040.png?241220"
+    "image_url": "../images/cardlist/card/OP09-040.png?241220",
+    "trigger": "[Trigger] Rest up to 1 of your opponent's Characters with a cost of 4 or less."
   },
   {
     "card_id": "OP09-041",
@@ -1139,7 +1196,8 @@
     ],
     "text": "[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this battle. Then, if your Leader has the {ODYSSEY} type and you have 2 or more rested Characters, set up to 2 of your Characters as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-041.png?241220"
+    "image_url": "../images/cardlist/card/OP09-041.png?241220",
+    "trigger": "[Trigger] Rest up to 1 of your opponent's Characters with a cost of 4 or less."
   },
   {
     "card_id": "OP09-042",
@@ -1159,7 +1217,8 @@
     ],
     "text": "[Activate: Main] You may rest 5 of your DON!! cards and trash 1 card from your hand: Play up to 1 {Cross Guild} type Character card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-042.png?241220"
+    "image_url": "../images/cardlist/card/OP09-042.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-042",
@@ -1179,7 +1238,8 @@
     ],
     "text": "[Activate: Main] You may rest 5 of your DON!! cards and trash 1 card from your hand: Play up to 1 {Cross Guild} type Character card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-042_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-042_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-043",
@@ -1198,7 +1258,8 @@
     ],
     "text": "[On K.O.] If your Leader has the {Cross Guild} type, play up to 1 Character card with a cost of 5 or less other than [Alvida] from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-043.png?241220"
+    "image_url": "../images/cardlist/card/OP09-043.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-044",
@@ -1218,7 +1279,8 @@
     ],
     "text": "[When Attacking] Look at 5 cards from the top of your deck; reveal up to 1 {Land of Wano} type card or card with a type including \"Whitebeard Pirates\" and add it to your hand. Then, place the rest at the bottom of your deck in any order and trash 1 card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-044.png?241220"
+    "image_url": "../images/cardlist/card/OP09-044.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-045",
@@ -1237,7 +1299,8 @@
     ],
     "text": "If you have a [Buggy] or [Mohji] Character, this Character cannot be K.O.'d in battle.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-045.png?241220"
+    "image_url": "../images/cardlist/card/OP09-045.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-046",
@@ -1257,7 +1320,8 @@
     ],
     "text": "[On Play] Play up to 1 {Cross Guild} type Character card or Character card with a type including \"Baroque Works\" with a cost of 5 or less from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-046.png?241220"
+    "image_url": "../images/cardlist/card/OP09-046.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-046",
@@ -1277,7 +1341,8 @@
     ],
     "text": "[On Play] Play up to 1 {Cross Guild} type Character card or Character card with a type including \"Baroque Works\" with a cost of 5 or less from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-046_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-046_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-047",
@@ -1297,7 +1362,8 @@
     ],
     "text": "[Double Attack] (This card deals 2 damage.)\n[On K.O.] Draw 2 cards and trash 1 card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-047.png?241220"
+    "image_url": "../images/cardlist/card/OP09-047.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-048",
@@ -1316,7 +1382,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] Draw 2 cards and trash 1 card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-048.png?241220"
+    "image_url": "../images/cardlist/card/OP09-048.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-048",
@@ -1335,7 +1402,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] Draw 2 cards and trash 1 card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-048_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-048_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-049",
@@ -1354,7 +1422,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-049.png?241220"
+    "image_url": "../images/cardlist/card/OP09-049.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-050",
@@ -1373,7 +1442,8 @@
     ],
     "text": "[When Attacking] Look at 5 cards from the top of your deck; reveal up to 1 blue Event and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-050.png?241220"
+    "image_url": "../images/cardlist/card/OP09-050.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-050",
@@ -1392,7 +1462,8 @@
     ],
     "text": "[When Attacking] Look at 5 cards from the top of your deck; reveal up to 1 blue Event and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-050_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-050_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-051",
@@ -1412,7 +1483,8 @@
     ],
     "text": "[On Play] Place up to 1 of your opponent's Characters at the bottom of the owner's deck. Then, if you do not have 5 Characters with a cost of 5 or more, place this Character at the bottom of the owner's deck.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-051.png?241220"
+    "image_url": "../images/cardlist/card/OP09-051.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-051",
@@ -1432,7 +1504,8 @@
     ],
     "text": "[On Play] Place up to 1 of your opponent's Characters at the bottom of the owner's deck. Then, if you do not have 5 Characters with a cost of 5 or more, place this Character at the bottom of the owner's deck.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-051_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-051_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-051",
@@ -1452,7 +1525,8 @@
     ],
     "text": "[On Play] Place up to 1 of your opponent's Characters at the bottom of the owner's deck. Then, if you do not have 5 Characters with a cost of 5 or more, place this Character at the bottom of the owner's deck.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-051_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP09-051_p2.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-051",
@@ -1472,7 +1546,8 @@
     ],
     "text": "[On Play] Place up to 1 of your opponent's Characters at the bottom of the owner's deck. Then, if you do not have 5 Characters with a cost of 5 or more, place this Character at the bottom of the owner's deck.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-051_p3.png?241220"
+    "image_url": "../images/cardlist/card/OP09-051_p3.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-052",
@@ -1491,7 +1566,8 @@
     ],
     "text": "[Opponent's Turn] You may trash 1 card from your hand: When this Character is K.O.'d by your opponent's effect, play this Character card from your trash rested.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-052.png?241220"
+    "image_url": "../images/cardlist/card/OP09-052.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-053",
@@ -1510,7 +1586,8 @@
     ],
     "text": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Richie] and add it to your hand. Then, place the rest at the bottom of your deck in any order and play up to 1 [Richie] from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-053.png?241220"
+    "image_url": "../images/cardlist/card/OP09-053.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-054",
@@ -1530,7 +1607,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-054.png?241220"
+    "image_url": "../images/cardlist/card/OP09-054.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-055",
@@ -1550,7 +1628,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-055.png?241220"
+    "image_url": "../images/cardlist/card/OP09-055.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-056",
@@ -1570,7 +1649,8 @@
     ],
     "text": "[On Play] Look at 4 cards from the top of your deck; reveal up to 1 {Cross Guild} type card or card with a type including \"Baroque Works\" other than [Mr.3(Galdino)] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-056.png?241220"
+    "image_url": "../images/cardlist/card/OP09-056.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-057",
@@ -1589,7 +1669,8 @@
     ],
     "text": "[Main] Look at 4 cards from the top of your deck; reveal up to 1 {Cross Guild} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-057.png?241220"
+    "image_url": "../images/cardlist/card/OP09-057.png?241220",
+    "trigger": "[Trigger] Activate this card's [Main] effect."
   },
   {
     "card_id": "OP09-058",
@@ -1608,7 +1689,8 @@
     ],
     "text": "[Main] Return up to 1 of your opponent's Characters with a cost of 6 or less to the owner's hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-058.png?241220"
+    "image_url": "../images/cardlist/card/OP09-058.png?241220",
+    "trigger": "[Trigger] Return up to 1 Character with a cost of 3 or less to the owner's hand."
   },
   {
     "card_id": "OP09-059",
@@ -1627,7 +1709,8 @@
     ],
     "text": "[Counter] Up to 1 of your Leader or Character cards gains +3000 power during this battle. Then, trash up to 2 cards from your hand. Trash the same number of cards from the top of your deck as you did from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-059.png?241220"
+    "image_url": "../images/cardlist/card/OP09-059.png?241220",
+    "trigger": "[Trigger] Draw 1 card."
   },
   {
     "card_id": "OP09-060",
@@ -1646,7 +1729,8 @@
     ],
     "text": "[Activate: Main] You may place 2 cards from your hand at the bottom of your deck in any order and rest this Stage: If your Leader has the {Cross Guild} type, draw 2 cards.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-060.png?241220"
+    "image_url": "../images/cardlist/card/OP09-060.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-061",
@@ -1667,7 +1751,8 @@
     ],
     "text": "[DON!! x1] All of your Characters gain +1 cost.\n[Your Turn] [Once Per Turn] When 2 or more DON!! cards on your field are returned to your DON!! deck, add up to 1 DON!! card from your DON!! deck and set it as active, and add up to 1 additional DON!! card and rest it.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-061.png?241220"
+    "image_url": "../images/cardlist/card/OP09-061.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-061",
@@ -1688,7 +1773,8 @@
     ],
     "text": "[DON!! x1] All of your Characters gain +1 cost.\n[Your Turn] [Once Per Turn] When 2 or more DON!! cards on your field are returned to your DON!! deck, add up to 1 DON!! card from your DON!! deck and set it as active, and add up to 1 additional DON!! card and rest it.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-061_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-061_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-062",
@@ -1708,7 +1794,8 @@
     ],
     "text": "[Banish] (When this card deals damage, the target card is trashed without activating its Trigger.)\n[When Attacking] You may trash 1 card with a [Trigger] from your hand: Add up to 1 DON!! card from your DON!! deck and rest it.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-062.png?241220"
+    "image_url": "../images/cardlist/card/OP09-062.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-062",
@@ -1728,7 +1815,8 @@
     ],
     "text": "[Banish] (When this card deals damage, the target card is trashed without activating its Trigger.)\n[When Attacking] You may trash 1 card with a [Trigger] from your hand: Add up to 1 DON!! card from your DON!! deck and rest it.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-062_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-062_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-063",
@@ -1747,7 +1835,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-063.png?241220"
+    "image_url": "../images/cardlist/card/OP09-063.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-064",
@@ -1766,7 +1855,8 @@
     ],
     "text": "[On Play] DON!! -1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Set up to 1 of your {Kid Pirates} type Leader as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-064.png?241220"
+    "image_url": "../images/cardlist/card/OP09-064.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-065",
@@ -1785,7 +1875,8 @@
     ],
     "text": "[On Play] You may return 1 or more DON!! cards from your field to your DON!! deck: This Character gains [Rush] during this turn. Then, rest up to 1 of your opponent's Characters with a cost of 6 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-065.png?241220"
+    "image_url": "../images/cardlist/card/OP09-065.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-065",
@@ -1804,7 +1895,8 @@
     ],
     "text": "[On Play] You may return 1 or more DON!! cards from your field to your DON!! deck: This Character gains [Rush] during this turn. Then, rest up to 1 of your opponent's Characters with a cost of 6 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-065_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-065_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-066",
@@ -1823,7 +1915,8 @@
     ],
     "text": "[On Play] If your opponent has more DON!! cards on their field than you, K.O. up to 1 of your opponent's Characters with a cost of 3 or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-066.png?241220"
+    "image_url": "../images/cardlist/card/OP09-066.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-067",
@@ -1843,7 +1936,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-067.png?241220"
+    "image_url": "../images/cardlist/card/OP09-067.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-068",
@@ -1863,7 +1957,8 @@
     ],
     "text": "[End of Your Turn] You may return 1 or more DON!! cards from your field to your DON!! deck: Set this Character as active. Then, this Character gains [Blocker] until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-068.png?241220"
+    "image_url": "../images/cardlist/card/OP09-068.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-069",
@@ -1882,7 +1977,8 @@
     ],
     "text": "[On Play] Look at 4 cards from the top of your deck; reveal up to 1 {Straw Hat Crew} or {Heart Pirates} type card with a cost of 2 or more and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-069.png?241220"
+    "image_url": "../images/cardlist/card/OP09-069.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-069",
@@ -1901,7 +1997,8 @@
     ],
     "text": "[On Play] Look at 4 cards from the top of your deck; reveal up to 1 {Straw Hat Crew} or {Heart Pirates} type card with a cost of 2 or more and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-069_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-069_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-070",
@@ -1920,7 +2017,8 @@
     ],
     "text": "[On Play] You may return 1 or more DON!! cards from your field to your DON!! deck: Give up to 2 rested DON!! cards to your Leader or 1 of your Characters.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-070.png?241220"
+    "image_url": "../images/cardlist/card/OP09-070.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-071",
@@ -1939,7 +2037,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-071.png?241220"
+    "image_url": "../images/cardlist/card/OP09-071.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-072",
@@ -1958,7 +2057,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] DON!! -2, You may trash 1 card from your hand: Draw 2 cards.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-072.png?241220"
+    "image_url": "../images/cardlist/card/OP09-072.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-072",
@@ -1977,7 +2077,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)\n[On Play] DON!! -2, You may trash 1 card from your hand: Draw 2 cards.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-072_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-072_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-073",
@@ -1996,7 +2097,8 @@
     ],
     "text": "[When Attacking] You may return 1 or more DON!! cards from your field to your DON!! deck: Give up to 2 of your opponent's Characters -2000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-073.png?241220"
+    "image_url": "../images/cardlist/card/OP09-073.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-074",
@@ -2016,7 +2118,8 @@
     ],
     "text": "[Your Turn] [Once Per Turn] When a DON!! card on your field is returned to your DON!! deck, up to 1 of your Leader or Character cards gains +1000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-074.png?241220"
+    "image_url": "../images/cardlist/card/OP09-074.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-075",
@@ -2035,7 +2138,8 @@
     ],
     "text": "[On Play] You may add 1 card from the top of your Life cards to your hand: If your Leader has the {Kid Pirates} type, add up to 1 DON!! card from your DON!! deck and set it as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-075.png?241220"
+    "image_url": "../images/cardlist/card/OP09-075.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-076",
@@ -2054,7 +2158,8 @@
     ],
     "text": "[On Play] You may return 1 or more DON!! cards from your field to your DON!! deck: Add up to 1 DON!! card from your DON!! deck and set it as active.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-076.png?241220"
+    "image_url": "../images/cardlist/card/OP09-076.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-077",
@@ -2074,7 +2179,8 @@
     ],
     "text": "[Main] DON!! -2 (You may return the specified number of DON!! cards from your field to your DON!! deck.): K.O. up to 1 of your opponent's Characters with 6000 power or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-077.png?241220"
+    "image_url": "../images/cardlist/card/OP09-077.png?241220",
+    "trigger": "[Trigger] Add up to 1 DON!! card from your DON!! deck and set it as active."
   },
   {
     "card_id": "OP09-078",
@@ -2094,7 +2200,8 @@
     ],
     "text": "[Counter] DON!! -2, You may trash 1 card from your hand: If your Leader has the {Straw Hat Crew} type, up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, draw 2 cards.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-078.png?241220"
+    "image_url": "../images/cardlist/card/OP09-078.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-079",
@@ -2114,7 +2221,8 @@
     ],
     "text": "[Main] DON!! -2 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Rest up to 1 of your opponent's Characters with a cost of 5 or less. Then, draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-079.png?241220"
+    "image_url": "../images/cardlist/card/OP09-079.png?241220",
+    "trigger": "[Trigger] Add up to 1 DON!! card from your DON!! deck and set it as active."
   },
   {
     "card_id": "OP09-080",
@@ -2133,7 +2241,8 @@
     ],
     "text": "[Opponent's Turn] You may rest this Stage: When your {Straw Hat Crew} type Character is removed from the field by your opponent's effect, add up to 1 DON!! card from your DON!! deck and rest it.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-080.png?241220"
+    "image_url": "../images/cardlist/card/OP09-080.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-081",
@@ -2153,7 +2262,8 @@
     ],
     "text": "Your [On Play] effects are negated.\n[Activate: Main] You may trash 1 card from your hand: Your opponent's [On Play] effects are negated until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-081.png?241220"
+    "image_url": "../images/cardlist/card/OP09-081.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-081",
@@ -2173,7 +2283,8 @@
     ],
     "text": "Your [On Play] effects are negated.\n[Activate: Main] You may trash 1 card from your hand: Your opponent's [On Play] effects are negated until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-081_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-081_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-082",
@@ -2192,7 +2303,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-082.png?241220"
+    "image_url": "../images/cardlist/card/OP09-082.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-083",
@@ -2211,7 +2323,8 @@
     ],
     "text": "[Activate: Main] You may rest this Character: If your Leader has the {Blackbeard Pirates} type, give up to 1 of your opponent's Characters -3 cost during this turn.\n[On K.O.] Draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-083.png?241220"
+    "image_url": "../images/cardlist/card/OP09-083.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-084",
@@ -2230,7 +2343,8 @@
     ],
     "text": "[Activate: Main] [Once Per Turn] If your Leader has the {Blackbeard Pirates} type, this Character gains [Double Attack], [Banish] or [Blocker] until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-084.png?241220"
+    "image_url": "../images/cardlist/card/OP09-084.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-085",
@@ -2249,7 +2363,8 @@
     ],
     "text": "[On Play] Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 2 or less from your trash rested.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-085.png?241220"
+    "image_url": "../images/cardlist/card/OP09-085.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-086",
@@ -2268,7 +2383,8 @@
     ],
     "text": "This Character cannot be K.O.'d by your opponent's effects.\nIf your Leader has the {Blackbeard Pirates} type, this Character gains +1000 power for every 4 cards in your trash.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-086.png?241220"
+    "image_url": "../images/cardlist/card/OP09-086.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-087",
@@ -2287,7 +2403,8 @@
     ],
     "text": "[On Play] If your opponent has 5 or more cards in their hand, your opponent trashes 1 card from their hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-087.png?241220"
+    "image_url": "../images/cardlist/card/OP09-087.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-088",
@@ -2306,7 +2423,8 @@
     ],
     "text": "[DON!! x1] [When Attacking] You may trash 2 cards from your hand: Draw 2 cards.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-088.png?241220"
+    "image_url": "../images/cardlist/card/OP09-088.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-089",
@@ -2326,7 +2444,8 @@
     ],
     "text": "[Activate: Main] You may trash 1 card from your hand and trash this Character: If your Leader has the {Blackbeard Pirates} type, draw 1 card. Then, give up to 1 of your opponent's Characters -2 cost during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-089.png?241220"
+    "image_url": "../images/cardlist/card/OP09-089.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-090",
@@ -2345,7 +2464,8 @@
     ],
     "text": "[Activate: Main] You may rest this Character: If your Leader has the {Blackbeard Pirates} type, K.O. up to 1 of your opponent's Characters with a cost of 1 or less.\n[On K.O.] Draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-090.png?241220"
+    "image_url": "../images/cardlist/card/OP09-090.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-091",
@@ -2364,7 +2484,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-091.png?241220"
+    "image_url": "../images/cardlist/card/OP09-091.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-092",
@@ -2383,7 +2504,8 @@
     ],
     "text": "[Activate: Main] You may rest this Character: If the number of cards in your hand is at least 3 less than the number in your opponent's hand, draw 2 cards and trash 1 card from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-092.png?241220"
+    "image_url": "../images/cardlist/card/OP09-092.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-093",
@@ -2403,7 +2525,8 @@
     ],
     "text": "[Blocker]\n[Activate: Main] [Once Per Turn] If your Leader has the {Blackbeard Pirates} type and this Character was played on this turn, negate the effect of up to 1 of your opponent's Leader during this turn. Then, negate the effect of up to 1 of your opponent's Characters and that Character cannot attack until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-093.png?241220"
+    "image_url": "../images/cardlist/card/OP09-093.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-093",
@@ -2423,7 +2546,8 @@
     ],
     "text": "[Blocker]\n[Activate: Main] [Once Per Turn] If your Leader has the {Blackbeard Pirates} type and this Character was played on this turn, negate the effect of up to 1 of your opponent's Leader during this turn. Then, negate the effect of up to 1 of your opponent's Characters and that Character cannot attack until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-093_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-093_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-093",
@@ -2443,7 +2567,8 @@
     ],
     "text": "[Blocker]\n[Activate: Main] [Once Per Turn] If your Leader has the {Blackbeard Pirates} type and this Character was played on this turn, negate the effect of up to 1 of your opponent's Leader during this turn. Then, negate the effect of up to 1 of your opponent's Characters and that Character cannot attack until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-093_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP09-093_p2.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-093",
@@ -2463,7 +2588,8 @@
     ],
     "text": "[Blocker]\n[Activate: Main] [Once Per Turn] If your Leader has the {Blackbeard Pirates} type and this Character was played on this turn, negate the effect of up to 1 of your opponent's Leader during this turn. Then, negate the effect of up to 1 of your opponent's Characters and that Character cannot attack until the end of your opponent's next turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-093_p3.png?241220"
+    "image_url": "../images/cardlist/card/OP09-093_p3.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-094",
@@ -2483,7 +2609,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-094.png?241220"
+    "image_url": "../images/cardlist/card/OP09-094.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-095",
@@ -2502,7 +2629,8 @@
     ],
     "text": "[Activate: Main] You may rest 1 of your DON!! cards and this Character: Look at 5 cards from the top of your deck; reveal up to 1 {Blackbeard Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-095.png?241220"
+    "image_url": "../images/cardlist/card/OP09-095.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-096",
@@ -2521,7 +2649,8 @@
     ],
     "text": "[Main] Look at 3 cards from the top of your deck; reveal up to 1 {Blackbeard Pirates} type card other than [My Era...Begins!!] and add it to your hand. Then, trash the rest.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-096.png?241220"
+    "image_url": "../images/cardlist/card/OP09-096.png?241220",
+    "trigger": "[Trigger] Activate this card's [Main] effect."
   },
   {
     "card_id": "OP09-097",
@@ -2540,7 +2669,8 @@
     ],
     "text": "[Counter] Negate the effect of up to 1 of your opponent's Leader or Character cards and give that card -4000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-097.png?241220"
+    "image_url": "../images/cardlist/card/OP09-097.png?241220",
+    "trigger": "[Trigger] Negate the effect of up to 1 of your opponent's Leader or Character cards during this turn."
   },
   {
     "card_id": "OP09-098",
@@ -2559,7 +2689,8 @@
     ],
     "text": "[Main] If your Leader has the {Blackbeard Pirates} type, negate the effect of up to 1 of your opponent's Characters during this turn. Then, if that Character has a cost of 4 or less, K.O. it.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-098.png?241220"
+    "image_url": "../images/cardlist/card/OP09-098.png?241220",
+    "trigger": "[Trigger] Negate the effect of up to 1 of your opponent's Leader or Character cards during this turn."
   },
   {
     "card_id": "OP09-099",
@@ -2578,7 +2709,8 @@
     ],
     "text": "[Activate: Main] You may trash 1 card from your hand and rest this Stage: Look at 3 cards from the top of your deck; reveal up to 1 {Blackbeard Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-099.png?241220"
+    "image_url": "../images/cardlist/card/OP09-099.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-100",
@@ -2597,7 +2729,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-100.png?241220"
+    "image_url": "../images/cardlist/card/OP09-100.png?241220",
+    "trigger": "[Trigger] If your Leader has the {Revolutionary Army} type and you and your opponent have a total of 5 or less Life cards, play this card."
   },
   {
     "card_id": "OP09-101",
@@ -2616,7 +2749,8 @@
     ],
     "text": "[On Play] Place 1 of your opponent's Characters with a cost of 3 or less at the top or bottom of your opponent's Life cards face-up: Your opponent trashes 1 card from their hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-101.png?241220"
+    "image_url": "../images/cardlist/card/OP09-101.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-102",
@@ -2635,7 +2769,8 @@
     ],
     "text": "[On Play] If your Leader is [Nico Robin], look at 3 cards from the top of your deck; reveal up to 1 card with a [Trigger] and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-102.png?241220"
+    "image_url": "../images/cardlist/card/OP09-102.png?241220",
+    "trigger": "[Trigger] Activate this card's [On Play] effect."
   },
   {
     "card_id": "OP09-103",
@@ -2654,7 +2789,8 @@
     ],
     "text": "[Blocker]\n[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: Play up to 1 {Revolutionary Army} type Character card with a cost of 4 or less from your hand. If you do, draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-103.png?241220"
+    "image_url": "../images/cardlist/card/OP09-103.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-103",
@@ -2673,7 +2809,8 @@
     ],
     "text": "[Blocker]\n[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: Play up to 1 {Revolutionary Army} type Character card with a cost of 4 or less from your hand. If you do, draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-103_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-103_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-104",
@@ -2692,7 +2829,8 @@
     ],
     "text": "[On Play] Add up to 1 {Revolutionary Army} type Character card from your hand to the top of your Life cards face-up. Then, if you have 2 or more Life cards, add 1 card from the top or bottom of your Life cards to your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-104.png?241220"
+    "image_url": "../images/cardlist/card/OP09-104.png?241220",
+    "trigger": "[Trigger] If your Leader is multicolored, draw 2 cards."
   },
   {
     "card_id": "OP09-105",
@@ -2712,7 +2850,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-105.png?241220"
+    "image_url": "../images/cardlist/card/OP09-105.png?241220",
+    "trigger": "[Trigger] If your Leader has the {Egghead} type, add up to 1 card from the top of your deck to the top of your Life cards. Then, trash 2 cards from your hand."
   },
   {
     "card_id": "OP09-106",
@@ -2731,7 +2870,8 @@
     ],
     "text": "[On Play] Up to 1 of your [Nico Robin] Leader gains +3000 power during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-106.png?241220"
+    "image_url": "../images/cardlist/card/OP09-106.png?241220",
+    "trigger": "[Trigger] If your Leader is [Nico Robin], draw 3 cards and trash 2 cards from your hand."
   },
   {
     "card_id": "OP09-107",
@@ -2750,7 +2890,8 @@
     ],
     "text": "[On Play] If your opponent has 3 or more Life cards, trash up to 1 card from the top of your opponent's Life cards.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-107.png?241220"
+    "image_url": "../images/cardlist/card/OP09-107.png?241220",
+    "trigger": "[Trigger] Play up to 1 yellow Character card with a cost of 3 or less from your hand."
   },
   {
     "card_id": "OP09-107",
@@ -2769,7 +2910,8 @@
     ],
     "text": "[On Play] If your opponent has 3 or more Life cards, trash up to 1 card from the top of your opponent's Life cards.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-107_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-107_p1.png?241220",
+    "trigger": "[Trigger] Play up to 1 yellow Character card with a cost of 3 or less from your hand."
   },
   {
     "card_id": "OP09-108",
@@ -2789,7 +2931,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-108.png?241220"
+    "image_url": "../images/cardlist/card/OP09-108.png?241220",
+    "trigger": "[Trigger] If your Leader has the {Revolutionary Army} type and you and your opponent have a total of 5 or less Life cards, play this card."
   },
   {
     "card_id": "OP09-109",
@@ -2810,7 +2953,8 @@
     ],
     "text": "[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-109.png?241220"
+    "image_url": "../images/cardlist/card/OP09-109.png?241220",
+    "trigger": "[Trigger] If your Leader is [Nico Robin], play this card."
   },
   {
     "card_id": "OP09-110",
@@ -2830,7 +2974,8 @@
     ],
     "text": "[On Play] Draw 2 cards and trash 2 cards from your hand.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-110.png?241220"
+    "image_url": "../images/cardlist/card/OP09-110.png?241220",
+    "trigger": "[Trigger] Play this card."
   },
   {
     "card_id": "OP09-111",
@@ -2850,7 +2995,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-111.png?241220"
+    "image_url": "../images/cardlist/card/OP09-111.png?241220",
+    "trigger": "[Trigger] If your Leader has the {Egghead} type and your opponent has 6 or more cards in their hand, your opponent trashes 2 cards from their hand."
   },
   {
     "card_id": "OP09-112",
@@ -2869,7 +3015,8 @@
     ],
     "text": "[On Play] If you have 2 or less Life cards, draw 1 card.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-112.png?241220"
+    "image_url": "../images/cardlist/card/OP09-112.png?241220",
+    "trigger": "[Trigger] If your Leader has the {Revolutionary Army} type and you and your opponent have a total of 5 or less Life cards, play this card."
   },
   {
     "card_id": "OP09-113",
@@ -2889,7 +3036,8 @@
     ],
     "text": "-",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-113.png?241220"
+    "image_url": "../images/cardlist/card/OP09-113.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-114",
@@ -2909,7 +3057,8 @@
     ],
     "text": "[On Play] If you and your opponent have a total of 5 or less Life cards, K.O. up to 1 of your opponent's Characters with 2000 power or less.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-114.png?241220"
+    "image_url": "../images/cardlist/card/OP09-114.png?241220",
+    "trigger": "[Trigger] If you and your opponent have a total of 5 or less Life cards, play this card."
   },
   {
     "card_id": "OP09-115",
@@ -2928,7 +3077,8 @@
     ],
     "text": "[Main] K.O. up to 1 of your opponent's Characters with a cost of 3 or less and a [Trigger].",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-115.png?241220"
+    "image_url": "../images/cardlist/card/OP09-115.png?241220",
+    "trigger": "[Trigger] Draw 1 card."
   },
   {
     "card_id": "OP09-116",
@@ -2947,7 +3097,8 @@
     ],
     "text": "[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this battle.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-116.png?241220"
+    "image_url": "../images/cardlist/card/OP09-116.png?241220",
+    "trigger": "[Trigger] Play up to 1 {Revolutionary Army} type Character card with a cost of 4 or less from your hand."
   },
   {
     "card_id": "OP09-117",
@@ -2966,7 +3117,8 @@
     ],
     "text": "[Main] Look at 5 cards from the top of your deck; reveal up to 2 cards with a [Trigger] other than [Dereshi!] and add them to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-117.png?241220"
+    "image_url": "../images/cardlist/card/OP09-117.png?241220",
+    "trigger": "[Trigger] Draw 1 card."
   },
   {
     "card_id": "OP09-118",
@@ -2986,7 +3138,8 @@
     ],
     "text": "[Rush] (This card can attack on the turn in which it is played.)\nWhen your opponent activates [Blocker], if either you or your opponent has 0 Life cards, you win the game.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-118.png?241220"
+    "image_url": "../images/cardlist/card/OP09-118.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-118",
@@ -3006,7 +3159,8 @@
     ],
     "text": "[Rush] (This card can attack on the turn in which it is played.)\nWhen your opponent activates [Blocker], if either you or your opponent has 0 Life cards, you win the game.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-118_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-118_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-118",
@@ -3026,7 +3180,8 @@
     ],
     "text": "[Rush] (This card can attack on the turn in which it is played.)\nWhen your opponent activates [Blocker], if either you or your opponent has 0 Life cards, you win the game.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-118_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP09-118_p2.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-119",
@@ -3045,7 +3200,8 @@
     ],
     "text": "[On Play] You may return 1 or more DON!! cards from your field to your DON!! deck: Draw 1 card and this Character gains [Rush] during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-119.png?241220"
+    "image_url": "../images/cardlist/card/OP09-119.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-119",
@@ -3064,7 +3220,8 @@
     ],
     "text": "[On Play] You may return 1 or more DON!! cards from your field to your DON!! deck: Draw 1 card and this Character gains [Rush] during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-119_p1.png?241220"
+    "image_url": "../images/cardlist/card/OP09-119_p1.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "OP09-119",
@@ -3083,7 +3240,8 @@
     ],
     "text": "[On Play] You may return 1 or more DON!! cards from your field to your DON!! deck: Draw 1 card and this Character gains [Rush] during this turn.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/OP09-119_p2.png?241220"
+    "image_url": "../images/cardlist/card/OP09-119_p2.png?241220",
+    "trigger": "-"
   },
   {
     "card_id": "ST18-004",
@@ -3102,6 +3260,7 @@
     ],
     "text": "[On Play] Look at 5 cards from the top of your deck; reveal up to 1 purple {Straw Hat Crew} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.",
     "art_set": "OP-09",
-    "image_url": "../images/cardlist/card/ST18-004_p1.png?241220"
+    "image_url": "../images/cardlist/card/ST18-004_p1.png?241220",
+    "trigger": "-"
   }
 ]
