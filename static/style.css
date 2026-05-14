@@ -1,0 +1,415 @@
+/* ── Design tokens ─────────────────────────────────────────────────────── */
+
+:root {
+  /* Backgrounds */
+  --bg-page:      #0f0f1a;
+  --bg-card:      #1a1a2e;
+  --bg-subtle:    #252540;
+
+  /* Borders */
+  --border-dim:   #2a2a3e;
+  --border:       #3a3a5e;
+
+  /* Text */
+  --text:         #e0e0e0;
+  --text-muted:   #aaa;
+  --text-dim:     #666;
+  --text-dimmer:  #555;
+  --text-white:   #fff;
+
+  /* Accents */
+  --accent:       #6e6ef0;
+  --link:         #7eb8f7;
+  --error:        #e74c3c;
+  --highlight:    #f1c40f;
+  --trigger:      #b0a0ff;
+
+  /* Card type badge colors */
+  --type-leader:    #c0922a;
+  --type-character: #2a6fc0;
+  --type-event:     #7a2ac0;
+  --type-stage:     #2ac07a;
+
+  /* Card color filter active states */
+  --card-red:     #c0392b;
+  --card-green:   #27ae60;
+  --card-blue:    #2980b9;
+  --card-purple:  #8e44ad;
+  --card-black:   #616161;
+  --card-yellow:  #c49b10;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────────── */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-page);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Header / search bar ───────────────────────────────────────────────── */
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-page);
+  border-bottom: 1px solid var(--border-dim);
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-white);
+  letter-spacing: 0.06em;
+}
+
+#query {
+  width: 100%;
+  max-width: 580px;
+  padding: 0.55rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-white);
+  font-size: 0.95rem;
+  font-family: monospace;
+  outline: none;
+  transition: border-color 0.15s;
+}
+#query:focus { border-color: var(--accent); }
+#query.error { border-color: var(--error); }
+
+/* ── Filter rows ───────────────────────────────────────────────────────── */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+}
+
+.filter-sep {
+  width: 1px;
+  height: 1.2rem;
+  background: var(--border-dim);
+  flex-shrink: 0;
+}
+
+/* Toggle pill buttons used for colors, types, and series */
+.filter-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.filter-btn:hover  { border-color: var(--accent); color: var(--text-white); }
+.filter-btn.active { color: var(--text-white); border-color: transparent; }
+
+/* Color filter active states */
+.color-btn[data-color="Red"].active    { background: var(--card-red); }
+.color-btn[data-color="Green"].active  { background: var(--card-green); }
+.color-btn[data-color="Blue"].active   { background: var(--card-blue); }
+.color-btn[data-color="Purple"].active { background: var(--card-purple); }
+.color-btn[data-color="Black"].active  { background: var(--card-black); }
+.color-btn[data-color="Yellow"].active { background: var(--card-yellow); }
+
+/* Card type filter active states */
+.type-btn[data-type="LEADER"].active    { background: var(--type-leader); }
+.type-btn[data-type="CHARACTER"].active { background: var(--type-character); }
+.type-btn[data-type="EVENT"].active     { background: var(--type-event); }
+.type-btn[data-type="STAGE"].active     { background: var(--type-stage); color: #111; }
+
+/* Series buttons container (populated dynamically) */
+#series-btns { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+/* Text inputs inside filter rows (keyword, set) */
+.filter-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.filter-text-input {
+  padding: 0.22rem 0.6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.72rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.filter-text-input:focus { border-color: var(--accent); }
+
+#keyword-filter { width: 190px; }
+#set-filter     { width: 120px; font-family: monospace; }
+
+.clear-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+}
+.clear-btn:hover { color: var(--text-muted); }
+
+/* ── Example search chips ──────────────────────────────────────────────── */
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--text-dimmer);
+}
+
+.example-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  color: var(--link);
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.72rem;
+  transition: background 0.1s;
+}
+.example-chip:hover { background: #252545; }
+
+/* ── Status line ───────────────────────────────────────────────────────── */
+
+#status {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  min-height: 1em;
+}
+#status.err { color: var(--error); }
+
+/* ── Results list ──────────────────────────────────────────────────────── */
+
+main {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-width: 1000px;
+}
+
+.empty {
+  color: #444;
+  text-align: center;
+  padding: 3rem;
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+
+/* ── Card layout ───────────────────────────────────────────────────────── */
+
+.card {
+  display: flex;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 8px;
+  padding: 0.75rem;
+  align-items: flex-start;
+}
+
+/* Art thumbnail + prev/next switcher */
+.art-wrap {
+  width: 90px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.card-img {
+  width: 90px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  display: block;
+}
+
+.art-nav {
+  display: none;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.art-btn {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 3px;
+  width: 22px;
+  height: 18px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.art-btn:hover { background: var(--border); color: var(--text-white); }
+
+.art-count {
+  color: var(--text-dimmer);
+  font-size: 0.62rem;
+  min-width: 2rem;
+  text-align: center;
+}
+
+/* Card text columns */
+.card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.card-name { font-weight: 700; font-size: 0.95rem; color: var(--text-white); }
+.card-id   { font-size: 0.72rem; color: var(--text-dimmer); font-family: monospace; }
+
+/* Small label badges (type, rarity) */
+.badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rarity-badge { background: var(--bg-subtle); color: #777; }
+
+.type-leader    { background: var(--type-leader);    color: var(--text-white); }
+.type-character { background: var(--type-character); color: var(--text-white); }
+.type-event     { background: var(--type-event);     color: var(--text-white); }
+.type-stage     { background: var(--type-stage);     color: #111; }
+
+/* Inline color dot badge */
+.color-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  color: var(--text-white);
+}
+
+/* Stat row (Cost/Life, Power, Counter, Attr) */
+.card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.stat label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dimmer);
+  margin-right: 0.2rem;
+}
+
+/* Archetype/type pills (Straw Hat Crew, etc.) */
+.card-types { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.type-pill {
+  font-size: 0.67rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.08rem 0.45rem;
+  color: #999;
+}
+
+/* Effect text */
+.card-text {
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: #ccc;
+  word-break: break-word;
+}
+
+/* Trigger text (indented with accent bar) */
+.card-trigger {
+  font-size: 0.78rem;
+  line-height: 1.65;
+  color: var(--trigger);
+  border-left: 2px solid var(--accent);
+  padding-left: 0.5rem;
+}
+
+/* Clickable [Keyword] spans in card text */
+.kw {
+  color: var(--link);
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 1px;
+  transition: background 0.1s;
+}
+.kw:hover { background: #1e2d4a; text-decoration: underline; }
+
+/* Regex match highlight */
+mark {
+  background: var(--highlight);
+  color: #000;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ── Hover zoom overlay ─────────────────────────────────────────────────── */
+
+#art-zoom {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+  width: 280px;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+  display: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+#art-zoom.visible { display: block; opacity: 1; }
