@@ -361,10 +361,17 @@ function isLeaderIncompatible(text) {
   return false;
 }
 
+function applyLeaderColors(colors) {
+  document.querySelectorAll('.color-btn').forEach(btn => {
+    btn.classList.toggle('active', colors.includes(btn.dataset.color));
+  });
+}
+
 function clearLeader() {
   document.getElementById('leader-input').value = '';
   document.getElementById('leader-dropdown').hidden = true;
   selectedLeader = null;
+  applyLeaderColors([]); // clear colour filters
   doSearch();
 }
 
@@ -452,6 +459,7 @@ function buildLeaderDropdown(query) {
       document.getElementById('leader-input').value = `${leader.card_id}  ${leader.name}`;
       selectedLeader = { name: leader.name, types: leader.types || [], colors: leader.colors || [] };
       dropdown.hidden = true;
+      applyLeaderColors(leader.colors || []);
       doSearch();
     });
     dropdown.appendChild(item);
