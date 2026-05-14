@@ -223,9 +223,8 @@ h1 {
 main {
   padding: 1rem 1.5rem;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
   gap: 0.6rem;
-  max-width: 1100px;
   align-items: start;
 }
 
