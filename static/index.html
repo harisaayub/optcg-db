@@ -13,86 +13,88 @@
 
   <input id="query" type="text" placeholder="regex on effect text — e.g. draw \d+ card" autocomplete="off" spellcheck="false">
 
-  <div class="filters">
-    <div class="filter-group">
-      <span class="filter-label">Color</span>
-      <button class="filter-btn color-btn" data-color="Red">Red</button>
-      <button class="filter-btn color-btn" data-color="Green">Green</button>
-      <button class="filter-btn color-btn" data-color="Blue">Blue</button>
-      <button class="filter-btn color-btn" data-color="Purple">Purple</button>
-      <button class="filter-btn color-btn" data-color="Black">Black</button>
-      <button class="filter-btn color-btn" data-color="Yellow">Yellow</button>
-    </div>
-
-    <div class="filter-sep"></div>
-
-    <div class="filter-group">
-      <span class="filter-label">Type</span>
-      <button class="filter-btn type-btn" data-type="LEADER">Leader</button>
-      <button class="filter-btn type-btn" data-type="CHARACTER">Character</button>
-      <button class="filter-btn type-btn" data-type="EVENT">Event</button>
-      <button class="filter-btn type-btn" data-type="STAGE">Stage</button>
-    </div>
-
-    <div class="filter-sep"></div>
-
-    <div class="filter-group">
-      <span class="filter-label">Keyword</span>
-      <div class="filter-input-wrap">
-        <input id="keyword-filter" class="filter-text-input" list="keyword-list" placeholder="has [keyword]…" autocomplete="off">
-        <datalist id="keyword-list"></datalist>
-        <button class="clear-btn" title="Clear keyword" onclick="clearKeyword()">×</button>
+  <div id="filter-panel">
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Color</span>
+        <button class="filter-btn color-btn" data-color="Red">Red</button>
+        <button class="filter-btn color-btn" data-color="Green">Green</button>
+        <button class="filter-btn color-btn" data-color="Blue">Blue</button>
+        <button class="filter-btn color-btn" data-color="Purple">Purple</button>
+        <button class="filter-btn color-btn" data-color="Black">Black</button>
+        <button class="filter-btn color-btn" data-color="Yellow">Yellow</button>
       </div>
-      <span class="filter-label">not</span>
-      <div class="filter-input-wrap">
-        <input id="keyword-exclude" class="filter-text-input" list="keyword-list" placeholder="no [keyword]…" autocomplete="off">
-        <button class="clear-btn" title="Clear excluded keyword" onclick="clearKeywordExclude()">×</button>
+
+      <div class="filter-sep"></div>
+
+      <div class="filter-group">
+        <span class="filter-label">Type</span>
+        <button class="filter-btn type-btn" data-type="LEADER">Leader</button>
+        <button class="filter-btn type-btn" data-type="CHARACTER">Character</button>
+        <button class="filter-btn type-btn" data-type="EVENT">Event</button>
+        <button class="filter-btn type-btn" data-type="STAGE">Stage</button>
       </div>
-    </div>
-  </div>
 
-  <div class="filters" id="set-filters">
-    <div class="filter-group">
-      <span class="filter-label">Series</span>
-      <div id="series-btns"></div>
-    </div>
+      <div class="filter-sep"></div>
 
-    <div class="filter-sep"></div>
-
-    <div class="filter-group">
-      <span class="filter-label">Set</span>
-      <div class="filter-input-wrap">
-        <input id="set-filter" class="filter-text-input" list="set-list" placeholder="OP01, ST15…" autocomplete="off">
-        <datalist id="set-list"></datalist>
-        <button class="clear-btn" title="Clear set" onclick="clearSet()">×</button>
+      <div class="filter-group">
+        <span class="filter-label">Keyword</span>
+        <div class="filter-input-wrap">
+          <input id="keyword-filter" class="filter-text-input" list="keyword-list" placeholder="has [keyword]…" autocomplete="off">
+          <datalist id="keyword-list"></datalist>
+          <button class="clear-btn" title="Clear keyword" onclick="clearKeyword()">×</button>
+        </div>
+        <span class="filter-label">not</span>
+        <div class="filter-input-wrap">
+          <input id="keyword-exclude" class="filter-text-input" list="keyword-list" placeholder="no [keyword]…" autocomplete="off">
+          <button class="clear-btn" title="Clear excluded keyword" onclick="clearKeywordExclude()">×</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="tag-filter-row">
-    <div class="filter-group">
-      <span class="filter-label">Tags</span>
-      <div class="filter-input-wrap">
-        <input id="tag-search" class="filter-text-input" placeholder="filter tags…" autocomplete="off">
-        <button class="clear-btn" title="Clear all tag filters" onclick="clearTags()">×</button>
+    <div class="filters" id="set-filters">
+      <div class="filter-group">
+        <span class="filter-label">Series</span>
+        <div id="series-btns"></div>
+      </div>
+
+      <div class="filter-sep"></div>
+
+      <div class="filter-group">
+        <span class="filter-label">Set</span>
+        <div class="filter-input-wrap">
+          <input id="set-filter" class="filter-text-input" list="set-list" placeholder="OP01, ST15…" autocomplete="off">
+          <datalist id="set-list"></datalist>
+          <button class="clear-btn" title="Clear set" onclick="clearSet()">×</button>
+        </div>
       </div>
     </div>
-    <div id="tag-list" class="tag-list"></div>
-  </div>
 
-  <div class="examples">
-    <span>Try:</span>
-    <span class="example-chip" data-q="draw \d+ card">draw N cards</span>
-    <span class="example-chip" data-q="trash">trash</span>
-    <span class="example-chip" data-q="K\.O\.">K.O.</span>
-    <span class="example-chip" data-q="add .+ to your hand">add to hand</span>
-    <span class="example-chip" data-q="return .+ to (its|their|your) owner">bounce</span>
-    <span class="example-chip" data-q="opponent's Leader">vs Leader</span>
-    <span class="example-chip" data-q="end of (your|their) turn">end of turn</span>
-    <span class="example-chip" data-q="look at the top \d">top deck</span>
-  </div>
+    <div id="tag-filter-row">
+      <div class="filter-group">
+        <span class="filter-label">Tags</span>
+        <div class="filter-input-wrap">
+          <input id="tag-search" class="filter-text-input" placeholder="filter tags…" autocomplete="off">
+          <button class="clear-btn" title="Clear all tag filters" onclick="clearTags()">×</button>
+        </div>
+      </div>
+      <div id="tag-list" class="tag-list"></div>
+    </div>
 
-  <div id="status"></div>
+    <div class="examples">
+      <span>Try:</span>
+      <span class="example-chip" data-q="draw \d+ card">draw N cards</span>
+      <span class="example-chip" data-q="trash">trash</span>
+      <span class="example-chip" data-q="K\.O\.">K.O.</span>
+      <span class="example-chip" data-q="add .+ to your hand">add to hand</span>
+      <span class="example-chip" data-q="return .+ to (its|their|your) owner">bounce</span>
+      <span class="example-chip" data-q="opponent's Leader">vs Leader</span>
+      <span class="example-chip" data-q="end of (your|their) turn">end of turn</span>
+      <span class="example-chip" data-q="look at the top \d">top deck</span>
+    </div>
+
+    <div id="status"></div>
+  </div>
 </header>
 
 <main id="results">

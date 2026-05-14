@@ -87,6 +87,24 @@ h1 {
 #query:focus { border-color: var(--accent); }
 #query.error { border-color: var(--error); }
 
+/* ── Collapsible filter panel ──────────────────────────────────────────── */
+
+#filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  overflow: hidden;
+  max-height: 600px;
+  opacity: 1;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+header.collapsed #filter-panel {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ── Filter rows ───────────────────────────────────────────────────────── */
 
 .filters {

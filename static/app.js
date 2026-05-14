@@ -416,6 +416,18 @@ function loadSets() {
 // ── Init ─────────────────────────────────────────────────────────────────────
 
 function init() {
+  const headerEl = document.querySelector('header');
+  let prevScrollY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (y > prevScrollY && y > 60) {
+      headerEl.classList.add('collapsed');
+    } else if (y < prevScrollY || y <= 5) {
+      headerEl.classList.remove('collapsed');
+    }
+    prevScrollY = y;
+  }, { passive: true });
+
   let debounceTimer = null;
   function scheduleSearch() {
     clearTimeout(debounceTimer);
