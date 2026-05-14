@@ -174,7 +174,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	colorsParam := r.URL.Query().Get("colors")
 	typesParam := r.URL.Query().Get("types")
-	keyword := r.URL.Query().Get("keyword")
+	keywordParam := r.URL.Query().Get("keyword")
+	keywordMode := r.URL.Query().Get("keyword_mode") // "and" (default) or "or"
 	keywordExclude := r.URL.Query().Get("keyword_exclude")
 	setsParam := r.URL.Query().Get("sets")
 	seriesParam := r.URL.Query().Get("series")
@@ -182,7 +183,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	tagsExcludeParam := r.URL.Query().Get("tags_exclude")
 	excludeRotated := r.URL.Query().Get("exclude_rotated") == "1"
 
-	if q == "" && colorsParam == "" && typesParam == "" && keyword == "" &&
+	if q == "" && colorsParam == "" && typesParam == "" && keywordParam == "" &&
 		keywordExclude == "" && setsParam == "" && seriesParam == "" &&
 		tagsIncludeParam == "" && tagsExcludeParam == "" && !excludeRotated {
 		writeJSON(w, []CardResult{})
@@ -198,6 +199,10 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	keywords := splitList(keywordParam)
+	keywordExcludes := splitList(keywordExclude)
+	keywordOR := keywordMode == "or"
 
 	filterColors := splitParam(colorsParam)
 	filterTypes := splitParam(typesParam)
@@ -223,11 +228,45 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			if filterTypes != nil && !filterTypes[card.CardType] {
 				continue
 			}
-			if keyword != "" && !strings.Contains(plain, keyword) && !strings.Contains(plainTrigger, keyword) {
-				continue
+			if len(keywords) > 0 {
+				if keywordOR {
+					// OR: at least one keyword must appear
+					found := false
+					for _, kw := range keywords {
+						if strings.Contains(plain, kw) || strings.Contains(plainTrigger, kw) {
+							found = true
+							break
+						}
+					}
+					if !found {
+						continue
+					}
+				} else {
+					// AND: every keyword must appear
+					skip := false
+					for _, kw := range keywords {
+						if !strings.Contains(plain, kw) && !strings.Contains(plainTrigger, kw) {
+							skip = true
+							break
+						}
+					}
+					if skip {
+						continue
+					}
+				}
 			}
-			if keywordExclude != "" && (strings.Contains(plain, keywordExclude) || strings.Contains(plainTrigger, keywordExclude)) {
-				continue
+			// Excludes: card must not contain any of these
+			{
+				skip := false
+				for _, kw := range keywordExcludes {
+					if strings.Contains(plain, kw) || strings.Contains(plainTrigger, kw) {
+						skip = true
+						break
+					}
+				}
+				if skip {
+					continue
+				}
 			}
 			if filterSets != nil && !filterSets[cardSet(card.CardID)] {
 				continue
@@ -257,6 +296,21 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		results = append(results, *grouped[id])
 	}
 	writeJSON(w, results)
+}
+
+// splitList splits a comma-separated param into a trimmed string slice, or nil if empty.
+func splitList(s string) []string {
+	if s == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if p = strings.TrimSpace(p); p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
 }
 
 // splitParam splits a comma-separated query param into a lookup set, or nil if empty.

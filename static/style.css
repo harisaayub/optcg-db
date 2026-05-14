@@ -363,6 +363,126 @@ main {
   margin-top: 0.1rem;
 }
 
+/* ── Keyword chip input ────────────────────────────────────────────────── */
+
+.chip-input-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  min-width: 130px;
+  max-width: 260px;
+  cursor: text;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.chip-input-wrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(200, 153, 42, 0.1);
+}
+
+.chip-text-input {
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--text);
+  font-size: 0.75rem;
+  min-width: 80px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.keyword-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 5px 1px 7px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.keyword-chip.include {
+  background: rgba(200, 153, 42, 0.18);
+  border: 1px solid rgba(200, 153, 42, 0.35);
+  color: var(--link);
+}
+.keyword-chip.exclude {
+  background: rgba(192, 57, 43, 0.18);
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  color: #e07060;
+}
+.keyword-chip button {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0;
+}
+.keyword-chip button:hover { opacity: 1; }
+
+.keyword-mode-btn {
+  font-size: 0.65rem;
+  padding: 0.22rem 0.55rem;
+  letter-spacing: 0.05em;
+}
+.keyword-mode-btn.or-mode {
+  background: rgba(41, 128, 185, 0.2);
+  border-color: rgba(41, 128, 185, 0.4);
+  color: #70b0e0;
+}
+
+/* ── Keyword picker dropdown ────────────────────────────────────────────── */
+
+.keyword-dropdown {
+  position: fixed;
+  z-index: 200;
+  background: var(--bg-card);
+  border: 1px solid rgba(200, 153, 42, 0.25);
+  border-radius: 8px;
+  max-height: 280px;
+  min-width: 220px;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+.keyword-dropdown-search {
+  position: sticky;
+  top: 0;
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-dim);
+}
+.keyword-dropdown-search input {
+  width: 100%;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-white);
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  outline: none;
+}
+.keyword-dropdown-search input:focus { border-color: var(--accent); }
+
+.keyword-option {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  font-family: monospace;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-dim);
+  transition: background 0.07s;
+}
+.keyword-option:last-child { border-bottom: none; }
+.keyword-option:hover { background: var(--bg-subtle); color: var(--text-white); }
+.keyword-option.already-added { opacity: 0.35; cursor: default; }
+
 /* ── Leader incompatibility highlight ──────────────────────────────────── */
 
 .card.leader-incompatible {

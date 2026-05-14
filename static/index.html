@@ -55,15 +55,14 @@
 
       <div class="filter-group">
         <span class="filter-label">Keyword</span>
-        <div class="filter-input-wrap">
-          <input id="keyword-filter" class="filter-text-input" list="keyword-list" placeholder="has [keyword]…" autocomplete="off">
+        <button id="keyword-mode-btn" class="filter-btn keyword-mode-btn" title="Toggle AND / OR logic for keyword includes">ALL</button>
+        <div class="chip-input-wrap" id="keyword-include-wrap">
+          <input id="keyword-filter" class="chip-text-input" placeholder="add keyword…" autocomplete="off" spellcheck="false" readonly>
           <datalist id="keyword-list"></datalist>
-          <button class="clear-btn" title="Clear keyword" onclick="clearKeyword()">×</button>
         </div>
         <span class="filter-label">not</span>
-        <div class="filter-input-wrap">
-          <input id="keyword-exclude" class="filter-text-input" list="keyword-list" placeholder="no [keyword]…" autocomplete="off">
-          <button class="clear-btn" title="Clear excluded keyword" onclick="clearKeywordExclude()">×</button>
+        <div class="chip-input-wrap" id="keyword-exclude-wrap">
+          <input id="keyword-exclude" class="chip-text-input" placeholder="add keyword…" autocomplete="off" spellcheck="false" readonly>
         </div>
       </div>
     </div>
@@ -120,6 +119,7 @@
 
 <img id="art-zoom" alt="">
 <div id="leader-dropdown" class="leader-dropdown" hidden></div>
+<div id="keyword-dropdown" class="keyword-dropdown" hidden></div>
 
 <script src="app.js"></script>
 

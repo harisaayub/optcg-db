@@ -18,8 +18,6 @@ const EMPTY_STATE_MESSAGE = 'Use the search box, filters, or click a keyword on 
 // ── DOM references ───────────────────────────────────────────────────────────
 
 const searchInput      = document.getElementById('query');
-const keywordInput     = document.getElementById('keyword-filter');
-const keywordExcludeInput = document.getElementById('keyword-exclude');
 const setInput         = document.getElementById('set-filter');
 const statusBar        = document.getElementById('status');
 const resultsContainer = document.getElementById('results');
@@ -252,8 +250,6 @@ function buildSearchParams() {
   const q              = searchInput.value.trim();
   const colors         = [...document.querySelectorAll('.color-btn.active')].map(b => b.dataset.color);
   const types          = [...document.querySelectorAll('.type-btn.active')].map(b => b.dataset.type);
-  const keyword        = keywordInput.value.trim();
-  const keywordExclude = keywordExcludeInput.value.trim();
   const series         = activeSeries();
   const set            = setInput.value.trim();
   const excludeRotated = document.getElementById('exclude-rotated-btn').classList.contains('active');
@@ -264,7 +260,7 @@ function buildSearchParams() {
     else if (state === 'exclude') tagsExclude.push(name);
   });
 
-  return { q, colors, types, keyword, keywordExclude, series, set, excludeRotated, tagsInclude, tagsExclude };
+  return { q, colors, types, series, set, excludeRotated, tagsInclude, tagsExclude };
 }
 
 function showEmptyState(message) {
@@ -272,9 +268,10 @@ function showEmptyState(message) {
 }
 
 async function doSearch() {
-  const { q, colors, types, keyword, keywordExclude, series, set, excludeRotated, tagsInclude, tagsExclude } = buildSearchParams();
+  const { q, colors, types, series, set, excludeRotated, tagsInclude, tagsExclude } = buildSearchParams();
 
-  if (!q && !colors.length && !types.length && !keyword && !keywordExclude && !series.length && !set && !excludeRotated && !tagsInclude.length && !tagsExclude.length) {
+  if (!q && !colors.length && !types.length && !keywordIncludes.length && !keywordExcludes.length
+      && !series.length && !set && !excludeRotated && !tagsInclude.length && !tagsExclude.length) {
     searchInput.classList.remove('error');
     statusBar.textContent = '';
     statusBar.className   = '';
@@ -283,16 +280,19 @@ async function doSearch() {
   }
 
   const params = new URLSearchParams();
-  if (q)                params.set('q',               q);
-  if (colors.length)    params.set('colors',          colors.join(','));
-  if (types.length)     params.set('types',           types.join(','));
-  if (keyword)          params.set('keyword',         keyword);
-  if (keywordExclude)   params.set('keyword_exclude', keywordExclude);
-  if (series.length)    params.set('series',          series.join(','));
-  if (set)              params.set('sets',            set);
-  if (excludeRotated)       params.set('exclude_rotated', '1');
-  if (tagsInclude.length)   params.set('tags_include',    tagsInclude.join(','));
-  if (tagsExclude.length)   params.set('tags_exclude',    tagsExclude.join(','));
+  if (q)                      params.set('q',               q);
+  if (colors.length)          params.set('colors',          colors.join(','));
+  if (types.length)           params.set('types',           types.join(','));
+  if (keywordIncludes.length) {
+    params.set('keyword',      keywordIncludes.join(','));
+    if (keywordMode === 'or')  params.set('keyword_mode', 'or');
+  }
+  if (keywordExcludes.length) params.set('keyword_exclude', keywordExcludes.join(','));
+  if (series.length)          params.set('series',          series.join(','));
+  if (set)                    params.set('sets',            set);
+  if (excludeRotated)         params.set('exclude_rotated', '1');
+  if (tagsInclude.length)     params.set('tags_include',    tagsInclude.join(','));
+  if (tagsExclude.length)     params.set('tags_exclude',    tagsExclude.join(','));
 
   let res, data;
   try {
@@ -418,18 +418,117 @@ function clearTags() {
   doSearch();
 }
 
+// ── Keyword chip filter ───────────────────────────────────────────────────────
+
+let keywordIncludes = []; // chips in the "has" group
+let keywordExcludes = []; // chips in the "not" group
+let keywordMode     = 'and'; // 'and' | 'or' — logic for include chips
+let allKeywords     = []; // populated by loadMeta
+
+function renderKeywordChips() {
+  const includeWrap = document.getElementById('keyword-include-wrap');
+  const excludeWrap = document.getElementById('keyword-exclude-wrap');
+  const includeInput = document.getElementById('keyword-filter');
+  const excludeInput = document.getElementById('keyword-exclude');
+
+  includeWrap.querySelectorAll('.keyword-chip').forEach(c => c.remove());
+  excludeWrap.querySelectorAll('.keyword-chip').forEach(c => c.remove());
+
+  keywordIncludes.forEach(kw => includeWrap.insertBefore(makeKeywordChip(kw, 'include'), includeInput));
+  keywordExcludes.forEach(kw => excludeWrap.insertBefore(makeKeywordChip(kw, 'exclude'), excludeInput));
+}
+
+function makeKeywordChip(kw, type) {
+  const chip  = document.createElement('span');
+  chip.className = `keyword-chip ${type}`;
+  const label = document.createElement('span');
+  label.textContent = kw;
+  const btn   = document.createElement('button');
+  btn.textContent = '×';
+  btn.addEventListener('mousedown', e => e.preventDefault());
+  btn.addEventListener('click', () => {
+    const arr = type === 'include' ? keywordIncludes : keywordExcludes;
+    arr.splice(arr.indexOf(kw), 1);
+    renderKeywordChips();
+    doSearch();
+  });
+  chip.appendChild(label);
+  chip.appendChild(btn);
+  return chip;
+}
+
+// ── Keyword dropdown ──────────────────────────────────────────────────────────
+
+let activeKeywordTarget = null; // 'include' | 'exclude'
+
+function positionKeywordDropdown() {
+  const inputId  = activeKeywordTarget === 'include' ? 'keyword-filter' : 'keyword-exclude';
+  const wrap     = document.getElementById(
+    activeKeywordTarget === 'include' ? 'keyword-include-wrap' : 'keyword-exclude-wrap'
+  );
+  const rect     = wrap.getBoundingClientRect();
+  const dropdown = document.getElementById('keyword-dropdown');
+  dropdown.style.top      = (rect.bottom + 4) + 'px';
+  dropdown.style.left     = rect.left + 'px';
+  dropdown.style.minWidth = Math.max(220, rect.width) + 'px';
+}
+
+function buildKeywordDropdown(query) {
+  const dropdown = document.getElementById('keyword-dropdown');
+  if (!activeKeywordTarget) { dropdown.hidden = true; return; }
+
+  const q = query.toLowerCase();
+  const current = activeKeywordTarget === 'include' ? keywordIncludes : keywordExcludes;
+
+  const filtered = (q
+    ? allKeywords.filter(kw => kw.toLowerCase().includes(q))
+    : allKeywords
+  ).slice(0, 60);
+
+  if (!filtered.length) { dropdown.hidden = true; return; }
+
+  dropdown.innerHTML = '';
+  filtered.forEach(kw => {
+    const item = document.createElement('div');
+    item.className = 'keyword-option' + (current.includes(kw) ? ' already-added' : '');
+    item.textContent = kw;
+    item.addEventListener('mousedown', e => e.preventDefault());
+    item.addEventListener('click', () => {
+      if (current.includes(kw)) return;
+      current.push(kw);
+      renderKeywordChips();
+      // clear the search input and keep dropdown open for more selections
+      const searchEl = document.getElementById(
+        activeKeywordTarget === 'include' ? 'keyword-filter' : 'keyword-exclude'
+      );
+      searchEl.value = '';
+      buildKeywordDropdown('');
+      doSearch();
+    });
+    dropdown.appendChild(item);
+  });
+
+  positionKeywordDropdown();
+  dropdown.hidden = false;
+}
+
+function openKeywordDropdown(target) {
+  activeKeywordTarget = target;
+  buildKeywordDropdown('');
+}
+
+function closeKeywordDropdown() {
+  activeKeywordTarget = null;
+  document.getElementById('keyword-dropdown').hidden = true;
+}
+
 // ── API loaders ──────────────────────────────────────────────────────────────
 
 // loadMeta fetches /api/meta once to populate sets, keywords, and types.
 function loadMeta() {
   fetch('/api/meta').then(r => r.json()).then(({ sets, keywords, types }) => {
-    // Keywords datalist
-    const keywordDatalist = document.getElementById('keyword-list');
-    keywords.forEach(kw => {
-      const opt = document.createElement('option');
-      opt.value = kw;
-      keywordDatalist.appendChild(opt);
-    });
+    // Keywords — stored for the custom dropdown
+    allKeywords = keywords;
 
     // Sets — store as SetEntry objects, build series buttons
     allSets = sets;
@@ -556,9 +655,42 @@ function init() {
   }
 
   searchInput.addEventListener('input', scheduleSearch);
-  keywordInput.addEventListener('input', scheduleSearch);
-  keywordExcludeInput.addEventListener('input', scheduleSearch);
   setInput.addEventListener('input', scheduleSearch);
+
+  // Keyword chip inputs — open custom dropdown on click/focus, filter on type
+  const kwIncludeInput = document.getElementById('keyword-filter');
+  const kwExcludeInput = document.getElementById('keyword-exclude');
+  const kwDropdown     = document.getElementById('keyword-dropdown');
+
+  function wireKeywordInput(input, target) {
+    // Make the whole wrap clickable to open the dropdown
+    input.closest('.chip-input-wrap').addEventListener('click', () => {
+      input.focus();
+      openKeywordDropdown(target);
+    });
+    input.addEventListener('focus', () => openKeywordDropdown(target));
+    input.addEventListener('input',  () => buildKeywordDropdown(input.value));
+    input.addEventListener('blur',   () => setTimeout(closeKeywordDropdown, 200));
+    input.removeAttribute('readonly'); // allow typing to filter
+  }
+  wireKeywordInput(kwIncludeInput, 'include');
+  wireKeywordInput(kwExcludeInput, 'exclude');
+
+  window.addEventListener('scroll', () => {
+    if (!kwDropdown.hidden) positionKeywordDropdown();
+  }, { passive: true });
+  window.addEventListener('resize', () => {
+    if (!kwDropdown.hidden) positionKeywordDropdown();
+  });
+
+  // AND/OR mode toggle
+  const keywordModeBtn = document.getElementById('keyword-mode-btn');
+  keywordModeBtn.addEventListener('click', () => {
+    keywordMode = keywordMode === 'and' ? 'or' : 'and';
+    keywordModeBtn.textContent = keywordMode === 'and' ? 'ALL' : 'ANY';
+    keywordModeBtn.classList.toggle('or-mode', keywordMode === 'or');
+    if (keywordIncludes.length) doSearch();
+  });
 
   document.querySelectorAll('.filter-btn').forEach(btn =>
     btn.addEventListener('click', () => { btn.classList.toggle('active'); doSearch(); })
