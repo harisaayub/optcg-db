@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+// ── Data types ────────────────────────────────────────────────────────────────
+
 type Card struct {
 	CardID    string   `json:"card_id"`
 	Rarity    string   `json:"rarity"`
@@ -30,17 +32,33 @@ type Card struct {
 	Trigger   string   `json:"trigger"`
 }
 
-// CardResult is what the API returns: one entry per card_id, with alt art URLs bundled in.
+// CardResult is one entry per card_id with alt art URLs bundled in.
 type CardResult struct {
 	Card
 	AltArts []string `json:"alt_arts"`
 }
 
-// TypeEntry is returned by /types: archetype name + how many unique cards carry it.
+// SetEntry is returned by /api/sets.
+type SetEntry struct {
+	Code    string `json:"code"`
+	Series  string `json:"series"`
+	Rotated bool   `json:"rotated"`
+}
+
+// TypeEntry is returned by /api/types: archetype name + unique card count.
 type TypeEntry struct {
 	Name  string `json:"name"`
 	Count int    `json:"count"`
 }
+
+// MetaResponse is returned by /api/meta for client bootstrap.
+type MetaResponse struct {
+	Sets     []SetEntry  `json:"sets"`
+	Keywords []string    `json:"keywords"`
+	Types    []TypeEntry `json:"types"`
+}
+
+// ── Global state ──────────────────────────────────────────────────────────────
 
 var cards []Card
 
@@ -49,29 +67,8 @@ var (
 	keywordRe = regexp.MustCompile(`\[[^\]]+\]`)
 )
 
-func main() {
-	data, err := os.ReadFile("card_list.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := json.Unmarshal(data, &cards); err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Loaded %d cards", len(cards))
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /search", searchHandler)
-	mux.HandleFunc("GET /keywords", keywordsHandler)
-	mux.HandleFunc("GET /sets", setsHandler)
-	mux.HandleFunc("GET /types", typesHandler)
-	mux.HandleFunc("GET /image", imageProxyHandler)
-	mux.Handle("/", http.FileServer(http.Dir("static")))
-
-	log.Println("Listening on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
-}
-
-// plainText strips HTML tags so regex and keyword matching run on readable text.
 func plainText(html string) string {
 	return htmlTagRe.ReplaceAllString(html, " ")
 }
@@ -82,6 +79,20 @@ func cardSet(id string) string {
 		return id[:i]
 	}
 	return id
+}
+
+// seriesFromSetCode strips trailing digits from a set code (e.g. "OP" from "OP05").
+func seriesFromSetCode(setCode string) string {
+	i := len(setCode)
+	for i > 0 && setCode[i-1] >= '0' && setCode[i-1] <= '9' {
+		i--
+	}
+	return setCode[:i]
+}
+
+// cardSeries returns the series prefix for a full card ID (e.g. "OP" from "OP05-093").
+func cardSeries(id string) string {
+	return seriesFromSetCode(cardSet(id))
 }
 
 // isRotated reports whether a set code belongs to the rotated (non-Standard) pool.
@@ -98,15 +109,66 @@ func isRotated(setCode string) bool {
 	return false
 }
 
-// cardSeries strips trailing digits from the set code (e.g. "OP" from "OP05", "PRB" from "PRB01").
-func cardSeries(id string) string {
-	s := cardSet(id)
-	i := len(s)
-	for i > 0 && s[i-1] >= '0' && s[i-1] <= '9' {
-		i--
-	}
-	return s[:i]
+func writeJSON(w http.ResponseWriter, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(v)
 }
+
+func writeError(w http.ResponseWriter, status int, msg string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]string{"error": msg})
+}
+
+// ── CORS middleware ───────────────────────────────────────────────────────────
+
+func withCORS(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		h(w, r)
+	}
+}
+
+// ── Entry point ───────────────────────────────────────────────────────────────
+
+func main() {
+	data, err := os.ReadFile("card_list.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := json.Unmarshal(data, &cards); err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Loaded %d cards", len(cards))
+
+	mux := http.NewServeMux()
+
+	// API routes — all CORS-enabled, all under /api/
+	mux.HandleFunc("GET /api/search", withCORS(searchHandler))
+	mux.HandleFunc("GET /api/leaders", withCORS(leadersHandler))
+	mux.HandleFunc("GET /api/card/{id}", withCORS(cardHandler))
+	mux.HandleFunc("GET /api/sets", withCORS(setsHandler))
+	mux.HandleFunc("GET /api/keywords", withCORS(keywordsHandler))
+	mux.HandleFunc("GET /api/types", withCORS(typesHandler))
+	mux.HandleFunc("GET /api/meta", withCORS(metaHandler))
+	// OPTIONS preflight catch-all for the /api/ subtree
+	mux.HandleFunc("OPTIONS /api/", withCORS(func(w http.ResponseWriter, r *http.Request) {}))
+
+	// Image proxy and static frontend — not versioned API
+	mux.HandleFunc("GET /image", imageProxyHandler)
+	mux.Handle("/", http.FileServer(http.Dir("static")))
+
+	log.Println("Listening on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", mux))
+}
+
+// ── Search ────────────────────────────────────────────────────────────────────
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
@@ -120,9 +182,10 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	tagsExcludeParam := r.URL.Query().Get("tags_exclude")
 	excludeRotated := r.URL.Query().Get("exclude_rotated") == "1"
 
-	if q == "" && colorsParam == "" && typesParam == "" && keyword == "" && keywordExclude == "" && setsParam == "" && seriesParam == "" && tagsIncludeParam == "" && tagsExcludeParam == "" && !excludeRotated {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode([]CardResult{})
+	if q == "" && colorsParam == "" && typesParam == "" && keyword == "" &&
+		keywordExclude == "" && setsParam == "" && seriesParam == "" &&
+		tagsIncludeParam == "" && tagsExcludeParam == "" && !excludeRotated {
+		writeJSON(w, []CardResult{})
 		return
 	}
 
@@ -131,63 +194,18 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		var err error
 		re, err = regexp.Compile("(?i)" + q)
 		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": "invalid regex: " + err.Error()})
+			writeError(w, http.StatusBadRequest, "invalid regex: "+err.Error())
 			return
 		}
 	}
 
-	var filterColors map[string]bool
-	if colorsParam != "" {
-		filterColors = make(map[string]bool)
-		for _, c := range strings.Split(colorsParam, ",") {
-			filterColors[strings.TrimSpace(c)] = true
-		}
-	}
+	filterColors := splitParam(colorsParam)
+	filterTypes := splitParam(typesParam)
+	filterSets := splitParam(setsParam)
+	filterSeries := splitParam(seriesParam)
+	filterTagsInclude := splitParam(tagsIncludeParam)
+	filterTagsExclude := splitParam(tagsExcludeParam)
 
-	var filterTypes map[string]bool
-	if typesParam != "" {
-		filterTypes = make(map[string]bool)
-		for _, t := range strings.Split(typesParam, ",") {
-			filterTypes[strings.TrimSpace(t)] = true
-		}
-	}
-
-	var filterSets map[string]bool
-	if setsParam != "" {
-		filterSets = make(map[string]bool)
-		for _, s := range strings.Split(setsParam, ",") {
-			filterSets[strings.TrimSpace(s)] = true
-		}
-	}
-
-	var filterSeries map[string]bool
-	if seriesParam != "" {
-		filterSeries = make(map[string]bool)
-		for _, s := range strings.Split(seriesParam, ",") {
-			filterSeries[strings.TrimSpace(s)] = true
-		}
-	}
-
-	var filterTagsInclude map[string]bool
-	if tagsIncludeParam != "" {
-		filterTagsInclude = make(map[string]bool)
-		for _, t := range strings.Split(tagsIncludeParam, ",") {
-			filterTagsInclude[strings.TrimSpace(t)] = true
-		}
-	}
-
-	var filterTagsExclude map[string]bool
-	if tagsExcludeParam != "" {
-		filterTagsExclude = make(map[string]bool)
-		for _, t := range strings.Split(tagsExcludeParam, ",") {
-			filterTagsExclude[strings.TrimSpace(t)] = true
-		}
-	}
-
-	// Group by card_id as we filter — first occurrence wins for card data,
-	// subsequent occurrences are alt arts.
 	grouped := make(map[string]*CardResult)
 	order := make([]string, 0)
 
@@ -195,27 +213,16 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		plain := plainText(card.Text)
 		plainTrigger := plainText(card.Trigger)
 
-		// Only run filters against the first (canonical) copy of each card.
 		if _, seen := grouped[card.CardID]; !seen {
 			if re != nil && !re.MatchString(plain) && !re.MatchString(plainTrigger) {
 				continue
 			}
-			if filterColors != nil {
-				match := false
-				for _, c := range card.Colors {
-					if filterColors[c] {
-						match = true
-						break
-					}
-				}
-				if !match {
-					continue
-				}
+			if filterColors != nil && !anyMatch(card.Colors, filterColors) {
+				continue
 			}
 			if filterTypes != nil && !filterTypes[card.CardType] {
 				continue
 			}
-			// Keyword filters are exact substring matches against plain text — no regex.
 			if keyword != "" && !strings.Contains(plain, keyword) && !strings.Contains(plainTrigger, keyword) {
 				continue
 			}
@@ -231,35 +238,16 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			if excludeRotated && isRotated(cardSet(card.CardID)) {
 				continue
 			}
-			if filterTagsInclude != nil {
-				match := false
-				for _, t := range card.Types {
-					if filterTagsInclude[t] {
-						match = true
-						break
-					}
-				}
-				if !match {
-					continue
-				}
+			if filterTagsInclude != nil && !anyMatch(card.Types, filterTagsInclude) {
+				continue
 			}
-			if filterTagsExclude != nil {
-				excluded := false
-				for _, t := range card.Types {
-					if filterTagsExclude[t] {
-						excluded = true
-						break
-					}
-				}
-				if excluded {
-					continue
-				}
+			if filterTagsExclude != nil && anyMatch(card.Types, filterTagsExclude) {
+				continue
 			}
 
 			grouped[card.CardID] = &CardResult{Card: card, AltArts: []string{}}
 			order = append(order, card.CardID)
 		} else {
-			// This is an alt art of a card that already passed filters.
 			grouped[card.CardID].AltArts = append(grouped[card.CardID].AltArts, card.ImageURL)
 		}
 	}
@@ -268,24 +256,99 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	for _, id := range order {
 		results = append(results, *grouped[id])
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
+	writeJSON(w, results)
 }
 
+// splitParam splits a comma-separated query param into a lookup set, or nil if empty.
+func splitParam(s string) map[string]bool {
+	if s == "" {
+		return nil
+	}
+	m := make(map[string]bool)
+	for _, v := range strings.Split(s, ",") {
+		m[strings.TrimSpace(v)] = true
+	}
+	return m
+}
+
+// anyMatch reports whether any value in vals is present in the allowed set.
+func anyMatch(vals []string, allowed map[string]bool) bool {
+	for _, v := range vals {
+		if allowed[v] {
+			return true
+		}
+	}
+	return false
+}
+
+// ── Leaders ───────────────────────────────────────────────────────────────────
+
+// leadersHandler returns every unique leader card with alt arts bundled.
+func leadersHandler(w http.ResponseWriter, r *http.Request) {
+	grouped := make(map[string]*CardResult)
+	order := make([]string, 0)
+	for _, card := range cards {
+		if card.CardType != "LEADER" {
+			continue
+		}
+		if _, seen := grouped[card.CardID]; !seen {
+			grouped[card.CardID] = &CardResult{Card: card, AltArts: []string{}}
+			order = append(order, card.CardID)
+		} else {
+			grouped[card.CardID].AltArts = append(grouped[card.CardID].AltArts, card.ImageURL)
+		}
+	}
+	results := make([]CardResult, 0, len(order))
+	for _, id := range order {
+		results = append(results, *grouped[id])
+	}
+	writeJSON(w, results)
+}
+
+// ── Single card ───────────────────────────────────────────────────────────────
+
+// cardHandler returns a single card by ID with alt arts bundled.
+func cardHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	var result *CardResult
+	for _, card := range cards {
+		if card.CardID != id {
+			continue
+		}
+		if result == nil {
+			result = &CardResult{Card: card, AltArts: []string{}}
+		} else {
+			result.AltArts = append(result.AltArts, card.ImageURL)
+		}
+	}
+	if result == nil {
+		http.NotFound(w, r)
+		return
+	}
+	writeJSON(w, result)
+}
+
+// ── Sets ──────────────────────────────────────────────────────────────────────
+
+// setsHandler returns all known sets with their series and rotation status.
 func setsHandler(w http.ResponseWriter, r *http.Request) {
 	seen := make(map[string]bool)
 	for _, card := range cards {
 		seen[cardSet(card.CardID)] = true
 	}
-	result := make([]string, 0, len(seen))
-	for s := range seen {
-		result = append(result, s)
+	result := make([]SetEntry, 0, len(seen))
+	for code := range seen {
+		result = append(result, SetEntry{
+			Code:    code,
+			Series:  seriesFromSetCode(code),
+			Rotated: isRotated(code),
+		})
 	}
-	sort.Strings(result)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	sort.Slice(result, func(i, j int) bool { return result[i].Code < result[j].Code })
+	writeJSON(w, result)
 }
+
+// ── Keywords ──────────────────────────────────────────────────────────────────
 
 func keywordsHandler(w http.ResponseWriter, r *http.Request) {
 	seen := make(map[string]bool)
@@ -302,9 +365,10 @@ func keywordsHandler(w http.ResponseWriter, r *http.Request) {
 		keywords = append(keywords, kw)
 	}
 	sort.Strings(keywords)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(keywords)
+	writeJSON(w, keywords)
 }
+
+// ── Types (archetypes) ────────────────────────────────────────────────────────
 
 func typesHandler(w http.ResponseWriter, r *http.Request) {
 	counts := make(map[string]int)
@@ -331,9 +395,74 @@ func typesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return result[i].Name < result[j].Name
 	})
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	writeJSON(w, result)
 }
+
+// ── Meta ──────────────────────────────────────────────────────────────────────
+
+// metaHandler returns all bootstrap data a client needs in one round-trip.
+func metaHandler(w http.ResponseWriter, r *http.Request) {
+	// Sets
+	seenSets := make(map[string]bool)
+	for _, card := range cards {
+		seenSets[cardSet(card.CardID)] = true
+	}
+	sets := make([]SetEntry, 0, len(seenSets))
+	for code := range seenSets {
+		sets = append(sets, SetEntry{
+			Code:    code,
+			Series:  cardSeries(code + "-"),
+			Rotated: isRotated(code),
+		})
+	}
+	sort.Slice(sets, func(i, j int) bool { return sets[i].Code < sets[j].Code })
+
+	// Keywords
+	seenKW := make(map[string]bool)
+	for _, card := range cards {
+		for _, kw := range keywordRe.FindAllString(plainText(card.Text), -1) {
+			seenKW[kw] = true
+		}
+		for _, kw := range keywordRe.FindAllString(card.Trigger, -1) {
+			seenKW[kw] = true
+		}
+	}
+	keywords := make([]string, 0, len(seenKW))
+	for kw := range seenKW {
+		keywords = append(keywords, kw)
+	}
+	sort.Strings(keywords)
+
+	// Types
+	counts := make(map[string]int)
+	seenCard := make(map[string]bool)
+	for _, card := range cards {
+		if seenCard[card.CardID] {
+			continue
+		}
+		seenCard[card.CardID] = true
+		for _, t := range card.Types {
+			t = strings.TrimSpace(t)
+			if t != "" && t != "-" {
+				counts[t]++
+			}
+		}
+	}
+	types := make([]TypeEntry, 0, len(counts))
+	for name, count := range counts {
+		types = append(types, TypeEntry{Name: name, Count: count})
+	}
+	sort.Slice(types, func(i, j int) bool {
+		if types[i].Count != types[j].Count {
+			return types[i].Count > types[j].Count
+		}
+		return types[i].Name < types[j].Name
+	})
+
+	writeJSON(w, MetaResponse{Sets: sets, Keywords: keywords, Types: types})
+}
+
+// ── Image proxy ───────────────────────────────────────────────────────────────
 
 func imageProxyHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
