@@ -38,6 +38,12 @@
       <div class="filter-sep"></div>
 
       <div class="filter-group">
+        <button id="exclude-rotated-btn" class="filter-btn">Exclude Rotated</button>
+      </div>
+
+      <div class="filter-sep"></div>
+
+      <div class="filter-group">
         <span class="filter-label">Keyword</span>
         <div class="filter-input-wrap">
           <input id="keyword-filter" class="filter-text-input" list="keyword-list" placeholder="has [keyword]…" autocomplete="off">
@@ -86,11 +92,12 @@
       <span class="example-chip" data-q="draw \d+ card">draw N cards</span>
       <span class="example-chip" data-q="trash">trash</span>
       <span class="example-chip" data-q="K\.O\.">K.O.</span>
+      <span class="example-chip" data-q="gains \+\d000 power">power buff</span>
       <span class="example-chip" data-q="add .+ to your hand">add to hand</span>
-      <span class="example-chip" data-q="return .+ to (its|their|your) owner">bounce</span>
+      <span class="example-chip" data-q="return .+ to.*hand">bounce</span>
       <span class="example-chip" data-q="opponent's Leader">vs Leader</span>
-      <span class="example-chip" data-q="end of (your|their) turn">end of turn</span>
-      <span class="example-chip" data-q="look at the top \d">top deck</span>
+      <span class="example-chip" data-q="end of (your|this) turn">end of turn</span>
+      <span class="example-chip" data-q="from the top of your deck">top of deck</span>
     </div>
 
     <div id="status"></div>

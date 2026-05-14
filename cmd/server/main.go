@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -83,6 +84,20 @@ func cardSet(id string) string {
 	return id
 }
 
+// isRotated reports whether a set code belongs to the rotated (non-Standard) pool.
+// Rotated: OP01–OP04, ST01–ST09.
+func isRotated(setCode string) bool {
+	if strings.HasPrefix(setCode, "OP") {
+		n, err := strconv.Atoi(strings.TrimPrefix(setCode, "OP"))
+		return err == nil && n < 5
+	}
+	if strings.HasPrefix(setCode, "ST") {
+		n, err := strconv.Atoi(strings.TrimPrefix(setCode, "ST"))
+		return err == nil && n < 10
+	}
+	return false
+}
+
 // cardSeries strips trailing digits from the set code (e.g. "OP" from "OP05", "PRB" from "PRB01").
 func cardSeries(id string) string {
 	s := cardSet(id)
@@ -103,8 +118,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	seriesParam := r.URL.Query().Get("series")
 	tagsIncludeParam := r.URL.Query().Get("tags_include")
 	tagsExcludeParam := r.URL.Query().Get("tags_exclude")
+	excludeRotated := r.URL.Query().Get("exclude_rotated") == "1"
 
-	if q == "" && colorsParam == "" && typesParam == "" && keyword == "" && keywordExclude == "" && setsParam == "" && seriesParam == "" && tagsIncludeParam == "" && tagsExcludeParam == "" {
+	if q == "" && colorsParam == "" && typesParam == "" && keyword == "" && keywordExclude == "" && setsParam == "" && seriesParam == "" && tagsIncludeParam == "" && tagsExcludeParam == "" && !excludeRotated {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode([]CardResult{})
 		return
@@ -210,6 +226,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			if filterSeries != nil && !filterSeries[cardSeries(card.CardID)] {
+				continue
+			}
+			if excludeRotated && isRotated(cardSet(card.CardID)) {
 				continue
 			}
 			if filterTagsInclude != nil {

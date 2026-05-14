@@ -255,6 +255,7 @@ function buildSearchParams() {
   const keywordExclude = keywordExcludeInput.value.trim();
   const series         = activeSeries();
   const set            = setInput.value.trim();
+  const excludeRotated = document.getElementById('exclude-rotated-btn').classList.contains('active');
   const tagsInclude    = [];
   const tagsExclude    = [];
   tagStates.forEach((state, name) => {
@@ -262,7 +263,7 @@ function buildSearchParams() {
     else if (state === 'exclude') tagsExclude.push(name);
   });
 
-  return { q, colors, types, keyword, keywordExclude, series, set, tagsInclude, tagsExclude };
+  return { q, colors, types, keyword, keywordExclude, series, set, excludeRotated, tagsInclude, tagsExclude };
 }
 
 function showEmptyState(message) {
@@ -270,9 +271,9 @@ function showEmptyState(message) {
 }
 
 async function doSearch() {
-  const { q, colors, types, keyword, keywordExclude, series, set, tagsInclude, tagsExclude } = buildSearchParams();
+  const { q, colors, types, keyword, keywordExclude, series, set, excludeRotated, tagsInclude, tagsExclude } = buildSearchParams();
 
-  if (!q && !colors.length && !types.length && !keyword && !keywordExclude && !series.length && !set && !tagsInclude.length && !tagsExclude.length) {
+  if (!q && !colors.length && !types.length && !keyword && !keywordExclude && !series.length && !set && !excludeRotated && !tagsInclude.length && !tagsExclude.length) {
     searchInput.classList.remove('error');
     statusBar.textContent = '';
     statusBar.className   = '';
@@ -288,8 +289,9 @@ async function doSearch() {
   if (keywordExclude)   params.set('keyword_exclude', keywordExclude);
   if (series.length)    params.set('series',          series.join(','));
   if (set)              params.set('sets',            set);
-  if (tagsInclude.length) params.set('tags_include',  tagsInclude.join(','));
-  if (tagsExclude.length) params.set('tags_exclude',  tagsExclude.join(','));
+  if (excludeRotated)       params.set('exclude_rotated', '1');
+  if (tagsInclude.length)   params.set('tags_include',    tagsInclude.join(','));
+  if (tagsExclude.length)   params.set('tags_exclude',    tagsExclude.join(','));
 
   let res, data;
   try {
