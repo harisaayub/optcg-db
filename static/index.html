@@ -45,9 +45,8 @@
 
       <div class="filter-group">
         <span class="filter-label">Leader</span>
-        <div class="filter-input-wrap">
-          <input id="leader-input" class="filter-text-input" list="leader-list" placeholder="e.g. Sanji, Luffy…" autocomplete="off">
-          <datalist id="leader-list"></datalist>
+        <div class="filter-input-wrap leader-picker">
+          <input id="leader-input" class="filter-text-input" placeholder="e.g. Sanji, Luffy…" autocomplete="off" spellcheck="false">
           <button class="clear-btn" title="Clear leader" onclick="clearLeader()">×</button>
         </div>
       </div>
@@ -120,6 +119,7 @@
 </main>
 
 <img id="art-zoom" alt="">
+<div id="leader-dropdown" class="leader-dropdown" hidden></div>
 
 <script src="app.js"></script>
 

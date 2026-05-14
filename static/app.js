@@ -363,6 +363,7 @@ function isLeaderIncompatible(text) {
 
 function clearLeader() {
   document.getElementById('leader-input').value = '';
+  document.getElementById('leader-dropdown').hidden = true;
   selectedLeader = null;
   doSearch();
 }
@@ -406,18 +407,58 @@ function loadKeywords() {
 function loadLeaders() {
   fetch('/search?types=LEADER')
     .then(r => r.json())
-    .then(leaders => {
-      allLeaders = leaders;
-      const dl   = document.getElementById('leader-list');
-      const seen = new Set();
-      leaders.forEach(l => {
-        if (seen.has(l.name)) return;
-        seen.add(l.name);
-        const opt = document.createElement('option');
-        opt.value = l.name;
-        dl.appendChild(opt);
-      });
+    .then(leaders => { allLeaders = leaders; });
+}
+
+function positionLeaderDropdown() {
+  const rect     = document.getElementById('leader-input').getBoundingClientRect();
+  const dropdown = document.getElementById('leader-dropdown');
+  dropdown.style.top     = (rect.bottom + 4) + 'px';
+  dropdown.style.left    = rect.left + 'px';
+  dropdown.style.minWidth = Math.max(320, rect.width) + 'px';
+}
+
+function buildLeaderDropdown(query) {
+  const dropdown = document.getElementById('leader-dropdown');
+  const q = query.toLowerCase().trim();
+
+  const filtered = q
+    ? allLeaders.filter(l =>
+        l.name.toLowerCase().includes(q) ||
+        l.card_id.toLowerCase().includes(q)
+      )
+    : allLeaders;
+
+  if (!filtered.length) { dropdown.hidden = true; return; }
+
+  dropdown.innerHTML = '';
+  filtered.slice(0, 30).forEach(leader => {
+    const item = document.createElement('div');
+    item.className = 'leader-option';
+
+    const types  = (leader.types  || []).join(', ');
+    const colors = (leader.colors || []).join('/');
+    const meta   = [leader.card_id, types, colors].filter(Boolean).join(' · ');
+
+    item.innerHTML = `
+      <img class="leader-option-img" src="${imageUrl(leader.image_url)}" alt="" loading="lazy">
+      <div class="leader-option-info">
+        <div class="leader-option-name">${escapeHtml(leader.name)}</div>
+        <div class="leader-option-meta">${escapeHtml(meta)}</div>
+      </div>`;
+
+    item.addEventListener('mousedown', e => e.preventDefault()); // keep focus on input
+    item.addEventListener('click', () => {
+      document.getElementById('leader-input').value = `${leader.card_id}  ${leader.name}`;
+      selectedLeader = { name: leader.name, types: leader.types || [], colors: leader.colors || [] };
+      dropdown.hidden = true;
+      doSearch();
     });
+    dropdown.appendChild(item);
+  });
+
+  positionLeaderDropdown();
+  dropdown.hidden = false;
 }
 
 function loadTypes() {
@@ -503,13 +544,23 @@ function init() {
     chip.addEventListener('click', () => { searchInput.value = chip.dataset.q; doSearch(); })
   );
 
-  document.getElementById('leader-input').addEventListener('input', () => {
-    const name  = document.getElementById('leader-input').value.trim();
-    const match = allLeaders.find(l => l.name === name);
-    selectedLeader = match
-      ? { name: match.name, types: match.types || [], colors: match.colors || [] }
-      : null;
-    doSearch();
+  const leaderInput    = document.getElementById('leader-input');
+  const leaderDropdown = document.getElementById('leader-dropdown');
+
+  leaderInput.addEventListener('focus', () => buildLeaderDropdown(leaderInput.value));
+  leaderInput.addEventListener('input', () => {
+    selectedLeader = null;
+    buildLeaderDropdown(leaderInput.value);
+    if (!leaderInput.value.trim()) doSearch();
+  });
+  leaderInput.addEventListener('blur', () => {
+    setTimeout(() => { leaderDropdown.hidden = true; }, 200);
+  });
+  window.addEventListener('scroll', () => {
+    if (!leaderDropdown.hidden) positionLeaderDropdown();
+  }, { passive: true });
+  window.addEventListener('resize', () => {
+    if (!leaderDropdown.hidden) positionLeaderDropdown();
   });
 
   loadKeywords();

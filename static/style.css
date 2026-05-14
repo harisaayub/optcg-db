@@ -256,6 +256,59 @@ main {
   line-height: 1.8;
 }
 
+/* ── Leader picker dropdown ─────────────────────────────────────────────── */
+
+.leader-dropdown {
+  position: fixed;
+  z-index: 200;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  max-height: 320px;
+  min-width: 320px;
+  overflow-y: auto;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+}
+
+.leader-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  transition: background 0.08s;
+  border-bottom: 1px solid var(--border-dim);
+}
+.leader-option:last-child { border-bottom: none; }
+.leader-option:hover { background: var(--bg-subtle); }
+
+.leader-option-img {
+  width: 36px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: var(--bg-subtle);
+}
+
+.leader-option-info { flex: 1; min-width: 0; }
+
+.leader-option-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leader-option-meta {
+  font-size: 0.63rem;
+  color: var(--text-dim);
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Leader incompatibility highlight ──────────────────────────────────── */
 
 .card.leader-incompatible {
