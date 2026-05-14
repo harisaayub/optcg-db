@@ -371,6 +371,12 @@ main {
 }
 .card.leader-incompatible .card-img { opacity: 0.85; }
 
+.card.leader-synergy {
+  border-color: rgba(39, 174, 96, 0.55);
+  background: #0b1a10;
+  box-shadow: 0 0 10px rgba(39, 174, 96, 0.18);
+}
+
 /* ── Card layout ───────────────────────────────────────────────────────── */
 
 .card {

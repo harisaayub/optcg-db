@@ -209,6 +209,7 @@ function renderCard(card, searchRegex) {
 
   const fullText = stripHtml(card.text) + ' ' + stripHtml(card.trigger || '');
   if (isLeaderIncompatible(fullText)) cardEl.classList.add('leader-incompatible');
+  else if (isLeaderSynergy(fullText)) cardEl.classList.add('leader-synergy');
 
   const allArts = [card.image_url, ...(card.alt_arts || [])];
 
@@ -357,6 +358,28 @@ function isLeaderIncompatible(text) {
     const condTypes   = [...m[1].matchAll(/\{([^}]+)\}/g)].map(n => n[1].toLowerCase());
     const leaderTypes = (selectedLeader.types || []).map(t => t.toLowerCase());
     if (!condTypes.some(t => leaderTypes.includes(t))) return true;
+  }
+
+  return false;
+}
+
+// Returns true if the card text contains a leader condition that explicitly
+// matches the selected leader (name or archetype). Cards flagged here synergize
+// with the leader on purpose — as opposed to generic cards with no condition.
+function isLeaderSynergy(text) {
+  if (!selectedLeader) return false;
+
+  const nameMatches = [...text.matchAll(/if your leader is (\[[^\]]+\](?:\s+or\s+\[[^\]]+\])*)/gi)];
+  for (const m of nameMatches) {
+    const condNames = [...m[1].matchAll(/\[([^\]]+)\]/g)].map(n => n[1].toLowerCase());
+    if (condNames.some(n => selectedLeader.name.toLowerCase() === n)) return true;
+  }
+
+  const typeMatches = [...text.matchAll(/if your leader has the (\{[^}]+\}(?:\s+or\s+\{[^}]+\})*) type/gi)];
+  for (const m of typeMatches) {
+    const condTypes   = [...m[1].matchAll(/\{([^}]+)\}/g)].map(n => n[1].toLowerCase());
+    const leaderTypes = (selectedLeader.types || []).map(t => t.toLowerCase());
+    if (condTypes.some(t => leaderTypes.includes(t))) return true;
   }
 
   return false;
