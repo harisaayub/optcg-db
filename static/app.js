@@ -35,13 +35,16 @@ function showZoom(thumbEl) {
   const zw    = ZOOM_WIDTH_PX;
   const zh    = zw * ZOOM_ASPECT_RATIO;
 
+  // Try right of card first, then left
   let left = rect.right + 14;
   if (left + zw > window.innerWidth - 8) left = rect.left - zw - 14;
+  // If card is very wide (grid layout), center the zoom above/below instead
+  if (left < 8) left = Math.min(rect.left, window.innerWidth - zw - 8);
 
   let top = rect.top;
   if (top + zh > window.innerHeight - 8) top = window.innerHeight - zh - 8;
 
-  zoomImage.style.left = left + 'px';
+  zoomImage.style.left = Math.max(8, left) + 'px';
   zoomImage.style.top  = Math.max(8, top) + 'px';
 
   requestAnimationFrame(() => zoomImage.classList.add('visible'));
