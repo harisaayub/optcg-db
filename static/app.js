@@ -206,6 +206,9 @@ function renderCard(card, searchRegex) {
   const cardEl = document.createElement('div');
   cardEl.className = 'card';
 
+  const fullText = stripHtml(card.text) + ' ' + stripHtml(card.trigger || '');
+  if (isLeaderIncompatible(fullText)) cardEl.classList.add('leader-incompatible');
+
   const allArts = [card.image_url, ...(card.alt_arts || [])];
 
   cardEl.innerHTML = `
@@ -330,6 +333,40 @@ async function doSearch() {
   resultsContainer.appendChild(frag);
 }
 
+// ── Leader compatibility ──────────────────────────────────────────────────────
+
+let selectedLeader = null; // { name, types, colors }
+let allLeaders     = [];
+
+// Returns true if the card text contains a leader condition that the selected
+// leader cannot satisfy (name mismatch or no matching archetype).
+function isLeaderIncompatible(text) {
+  if (!selectedLeader) return false;
+
+  // "if your Leader is [Name]" — supports "or" variants: [X] or [Y]
+  const nameMatches = [...text.matchAll(/if your leader is (\[[^\]]+\](?:\s+or\s+\[[^\]]+\])*)/gi)];
+  for (const m of nameMatches) {
+    const condNames = [...m[1].matchAll(/\[([^\]]+)\]/g)].map(n => n[1].toLowerCase());
+    if (!condNames.some(n => selectedLeader.name.toLowerCase() === n)) return true;
+  }
+
+  // "if your Leader has the {Type} type" — supports "or" variants: {X} or {Y}
+  const typeMatches = [...text.matchAll(/if your leader has the (\{[^}]+\}(?:\s+or\s+\{[^}]+\})*) type/gi)];
+  for (const m of typeMatches) {
+    const condTypes   = [...m[1].matchAll(/\{([^}]+)\}/g)].map(n => n[1].toLowerCase());
+    const leaderTypes = (selectedLeader.types || []).map(t => t.toLowerCase());
+    if (!condTypes.some(t => leaderTypes.includes(t))) return true;
+  }
+
+  return false;
+}
+
+function clearLeader() {
+  document.getElementById('leader-input').value = '';
+  selectedLeader = null;
+  doSearch();
+}
+
 // ── Tag (archetype) filter ───────────────────────────────────────────────────
 
 const tagStates = new Map(); // name → 'include' | 'exclude'
@@ -364,6 +401,23 @@ function loadKeywords() {
       keywordDatalist.appendChild(opt);
     });
   });
+}
+
+function loadLeaders() {
+  fetch('/search?types=LEADER')
+    .then(r => r.json())
+    .then(leaders => {
+      allLeaders = leaders;
+      const dl   = document.getElementById('leader-list');
+      const seen = new Set();
+      leaders.forEach(l => {
+        if (seen.has(l.name)) return;
+        seen.add(l.name);
+        const opt = document.createElement('option');
+        opt.value = l.name;
+        dl.appendChild(opt);
+      });
+    });
 }
 
 function loadTypes() {
@@ -449,9 +503,19 @@ function init() {
     chip.addEventListener('click', () => { searchInput.value = chip.dataset.q; doSearch(); })
   );
 
+  document.getElementById('leader-input').addEventListener('input', () => {
+    const name  = document.getElementById('leader-input').value.trim();
+    const match = allLeaders.find(l => l.name === name);
+    selectedLeader = match
+      ? { name: match.name, types: match.types || [], colors: match.colors || [] }
+      : null;
+    doSearch();
+  });
+
   loadKeywords();
   loadSets();
   loadTypes();
+  loadLeaders();
 }
 
 init();

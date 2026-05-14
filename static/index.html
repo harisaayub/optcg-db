@@ -44,6 +44,17 @@
       <div class="filter-sep"></div>
 
       <div class="filter-group">
+        <span class="filter-label">Leader</span>
+        <div class="filter-input-wrap">
+          <input id="leader-input" class="filter-text-input" list="leader-list" placeholder="e.g. Sanji, Luffy…" autocomplete="off">
+          <datalist id="leader-list"></datalist>
+          <button class="clear-btn" title="Clear leader" onclick="clearLeader()">×</button>
+        </div>
+      </div>
+
+      <div class="filter-sep"></div>
+
+      <div class="filter-group">
         <span class="filter-label">Keyword</span>
         <div class="filter-input-wrap">
           <input id="keyword-filter" class="filter-text-input" list="keyword-list" placeholder="has [keyword]…" autocomplete="off">

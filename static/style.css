@@ -191,6 +191,7 @@ header.collapsed #filter-panel {
 #keyword-exclude { width: 160px; }
 #set-filter      { width: 120px; font-family: monospace; }
 #tag-search      { width: 150px; }
+#leader-input    { width: 200px; }
 
 .clear-btn {
   background: none;
@@ -253,6 +254,13 @@ main {
   padding: 3rem;
   font-size: 0.88rem;
   line-height: 1.8;
+}
+
+/* ── Leader incompatibility highlight ──────────────────────────────────── */
+
+.card.leader-incompatible {
+  border-color: rgba(192, 57, 43, 0.55);
+  background: #1e1520;
 }
 
 /* ── Card layout ───────────────────────────────────────────────────────── */
