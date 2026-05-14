@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPTCG Card Search</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f1a;
+      color: #e0e0e0;
+      font-family: system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #0f0f1a;
+      border-bottom: 1px solid #2a2a3e;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    h1 { font-size: 1.1rem; font-weight: 700; color: #fff; letter-spacing: 0.06em; }
+
+    #query {
+      width: 100%;
+      max-width: 580px;
+      padding: 0.55rem 1rem;
+      background: #1a1a2e;
+      border: 1px solid #3a3a5e;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: monospace;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #query:focus { border-color: #6e6ef0; }
+    #query.error { border-color: #e74c3c; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #555;
+      flex-shrink: 0;
+    }
+
+    .filter-btn {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid #3a3a5e;
+      background: #1a1a2e;
+      color: #aaa;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .filter-btn:hover { border-color: #6e6ef0; color: #fff; }
+    .filter-btn.active { color: #fff; border-color: transparent; }
+
+    .color-btn[data-color="Red"].active    { background: #c0392b; }
+    .color-btn[data-color="Green"].active  { background: #27ae60; }
+    .color-btn[data-color="Blue"].active   { background: #2980b9; }
+    .color-btn[data-color="Purple"].active { background: #8e44ad; }
+    .color-btn[data-color="Black"].active  { background: #616161; }
+    .color-btn[data-color="Yellow"].active { background: #c49b10; }
+
+    .type-btn[data-type="LEADER"].active    { background: #c0922a; }
+    .type-btn[data-type="CHARACTER"].active { background: #2a6fc0; }
+    .type-btn[data-type="EVENT"].active     { background: #7a2ac0; }
+    .type-btn[data-type="STAGE"].active     { background: #2ac07a; color: #111; }
+
+    .filter-sep { width: 1px; height: 1.2rem; background: #2a2a3e; flex-shrink: 0; }
+
+    /* Keyword filter — plain text input, no regex */
+    .kw-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    #keyword-filter {
+      padding: 0.22rem 0.6rem;
+      background: #1a1a2e;
+      border: 1px solid #3a3a5e;
+      border-radius: 999px;
+      color: #e0e0e0;
+      font-size: 0.72rem;
+      outline: none;
+      width: 190px;
+      transition: border-color 0.15s;
+    }
+    #keyword-filter:focus { border-color: #6e6ef0; }
+    #kw-clear, .kw-clear-btn {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    #kw-clear:hover, .kw-clear-btn:hover { color: #aaa; }
+
+    #set-filter {
+      padding: 0.22rem 0.6rem;
+      background: #1a1a2e;
+      border: 1px solid #3a3a5e;
+      border-radius: 999px;
+      color: #e0e0e0;
+      font-size: 0.72rem;
+      outline: none;
+      width: 120px;
+      font-family: monospace;
+      transition: border-color 0.15s;
+    }
+    #set-filter:focus { border-color: #6e6ef0; }
+
+    #series-btns { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      color: #555;
+    }
+    .example-chip {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      color: #7eb8f7;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 0.72rem;
+      transition: background 0.1s;
+    }
+    .example-chip:hover { background: #252545; }
+
+    #status {
+      font-size: 0.78rem;
+      color: #666;
+      min-height: 1em;
+    }
+    #status.err { color: #e74c3c; }
+
+    main {
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      max-width: 1000px;
+    }
+
+    .card {
+      display: flex;
+      gap: 1rem;
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 8px;
+      padding: 0.75rem;
+      align-items: flex-start;
+    }
+
+    /* Art image + prev/next switcher */
+    .art-wrap {
+      width: 90px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .card-img {
+      width: 90px;
+      border-radius: 4px;
+      background: #252540;
+      display: block;
+    }
+    .art-nav {
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .art-btn {
+      background: #252540;
+      border: 1px solid #3a3a5e;
+      color: #aaa;
+      border-radius: 3px;
+      width: 22px;
+      height: 18px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .art-btn:hover { background: #3a3a5e; color: #fff; }
+    .art-count { color: #555; font-size: 0.62rem; min-width: 2rem; text-align: center; }
+
+    .card-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      min-width: 0;
+    }
+
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .card-name { font-weight: 700; font-size: 0.95rem; color: #fff; }
+    .card-id   { font-size: 0.72rem; color: #555; font-family: monospace; }
+
+    .badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.12rem 0.4rem;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .type-leader    { background: #c0922a; color: #fff; }
+    .type-character { background: #2a6fc0; color: #fff; }
+    .type-event     { background: #7a2ac0; color: #fff; }
+    .type-stage     { background: #2ac07a; color: #111; }
+
+    .color-badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.12rem 0.4rem;
+      border-radius: 4px;
+      color: #fff;
+    }
+
+    .card-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+    .stat label {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #555;
+      margin-right: 0.2rem;
+    }
+
+    .card-types { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+    .type-pill {
+      font-size: 0.67rem;
+      background: #252540;
+      border: 1px solid #3a3a5e;
+      border-radius: 999px;
+      padding: 0.08rem 0.45rem;
+      color: #999;
+    }
+
+    .card-text {
+      font-size: 0.8rem;
+      line-height: 1.65;
+      color: #ccc;
+      word-break: break-word;
+    }
+    .card-trigger {
+      font-size: 0.78rem;
+      line-height: 1.65;
+      color: #b0a0ff;
+      border-left: 2px solid #6e6ef0;
+      padding-left: 0.5rem;
+    }
+
+    /* [Keyword] spans — clicking sets the keyword filter */
+    .kw {
+      color: #7eb8f7;
+      cursor: pointer;
+      border-radius: 3px;
+      padding: 0 1px;
+      transition: background 0.1s;
+    }
+    .kw:hover { background: #1e2d4a; text-decoration: underline; }
+
+    mark {
+      background: #f1c40f;
+      color: #000;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    #art-zoom {
+      position: fixed;
+      z-index: 999;
+      pointer-events: none;
+      width: 280px;
+      border-radius: 8px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+      display: none;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+    }
+    #art-zoom.visible { display: block; opacity: 1; }
+
+    .empty {
+      color: #444;
+      text-align: center;
+      padding: 3rem;
+      font-size: 0.88rem;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>OPTCG Card Search</h1>
+
+  <input id="query" type="text" placeholder="regex on effect text — e.g. draw \d+ card" autocomplete="off" spellcheck="false">
+
+  <div class="filters">
+    <div class="filter-group">
+      <span class="filter-label">Color</span>
+      <button class="filter-btn color-btn" data-color="Red">Red</button>
+      <button class="filter-btn color-btn" data-color="Green">Green</button>
+      <button class="filter-btn color-btn" data-color="Blue">Blue</button>
+      <button class="filter-btn color-btn" data-color="Purple">Purple</button>
+      <button class="filter-btn color-btn" data-color="Black">Black</button>
+      <button class="filter-btn color-btn" data-color="Yellow">Yellow</button>
+    </div>
+
+    <div class="filter-sep"></div>
+
+    <div class="filter-group">
+      <span class="filter-label">Type</span>
+      <button class="filter-btn type-btn" data-type="LEADER">Leader</button>
+      <button class="filter-btn type-btn" data-type="CHARACTER">Character</button>
+      <button class="filter-btn type-btn" data-type="EVENT">Event</button>
+      <button class="filter-btn type-btn" data-type="STAGE">Stage</button>
+    </div>
+
+    <div class="filter-sep"></div>
+
+    <div class="filter-group">
+      <span class="filter-label">Keyword</span>
+      <div class="kw-wrap">
+        <input id="keyword-filter" list="keyword-list" placeholder="[On Play], [Blocker]…" autocomplete="off">
+        <datalist id="keyword-list"></datalist>
+        <button id="kw-clear" title="Clear keyword" onclick="clearKeyword()">×</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters" id="set-filters">
+    <div class="filter-group">
+      <span class="filter-label">Series</span>
+      <div id="series-btns"></div>
+    </div>
+
+    <div class="filter-sep"></div>
+
+    <div class="filter-group">
+      <span class="filter-label">Set</span>
+      <div class="kw-wrap">
+        <input id="set-filter" list="set-list" placeholder="OP01, ST15…" autocomplete="off">
+        <datalist id="set-list"></datalist>
+        <button class="kw-clear-btn" title="Clear set" onclick="clearSet()">×</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="examples">
+    <span>Try:</span>
+    <span class="example-chip" data-q="draw \d+ card">draw N cards</span>
+    <span class="example-chip" data-q="trash">trash</span>
+    <span class="example-chip" data-q="K\.O\.">K.O.</span>
+    <span class="example-chip" data-q="add .+ to your hand">add to hand</span>
+    <span class="example-chip" data-q="return .+ to (its|their|your) owner">bounce</span>
+    <span class="example-chip" data-q="opponent's Leader">vs Leader</span>
+    <span class="example-chip" data-q="end of (your|their) turn">end of turn</span>
+    <span class="example-chip" data-q="look at the top \d">top deck</span>
+  </div>
+
+  <div id="status"></div>
+</header>
+
+<main id="results">
+  <p class="empty">Use the search box, filters, or click a keyword on any card to begin.</p>
+</main>
+
+<img id="art-zoom" alt="">
+
+<script>
+  const colorMap = {
+    Red:'#c0392b', Green:'#27ae60', Blue:'#2980b9',
+    Purple:'#8e44ad', Black:'#616161', Yellow:'#c49b10'
+  };
+
+  // ── image zoom on hover ───────────────────────────────────────────────────
+
+  const artZoom = document.getElementById('art-zoom');
+
+  function showZoom(img) {
+    artZoom.src = img.src;
+    artZoom.style.display = 'block';
+
+    const r = img.getBoundingClientRect();
+    const zw = 280, zh = zw * 1.39; // card aspect ~421:585
+
+    let left = r.right + 14;
+    if (left + zw > window.innerWidth - 8) left = r.left - zw - 14;
+
+    let top = r.top;
+    if (top + zh > window.innerHeight - 8) top = window.innerHeight - zh - 8;
+
+    artZoom.style.left = left + 'px';
+    artZoom.style.top  = Math.max(8, top) + 'px';
+
+    // Trigger transition
+    requestAnimationFrame(() => artZoom.classList.add('visible'));
+  }
+
+  function hideZoom() {
+    artZoom.classList.remove('visible');
+    // Wait for fade-out before hiding
+    artZoom.addEventListener('transitionend', () => {
+      if (!artZoom.classList.contains('visible')) artZoom.style.display = 'none';
+    }, { once: true });
+  }
+
+  // ── helpers ──────────────────────────────────────────────────────────────
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function stripHtml(html) {
+    return (html || '')
+      .replace(/<br[^>]*>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ');
+  }
+
+  // Apply regex highlight only to text nodes, never inside tag attributes.
+  function applyHighlight(html, re) {
+    if (!re) return html;
+    return html.replace(/(<[^>]+>)|([^<]+)/g, (_, tag, text) => {
+      if (tag) return tag;
+      return text.replace(re, m => `<mark>${esc(m)}</mark>`);
+    });
+  }
+
+  function renderText(rawHtml, re) {
+    const plain   = stripHtml(rawHtml);
+    const escaped = esc(plain);
+
+    // [Keyword] spans — clicking sets the keyword filter (exact match, no regex).
+    const withKw = escaped.replace(/\[([^\]]+)\]/g, (_, kw) =>
+      `<span class="kw" onclick="setKeyword('[${esc(kw)}]')">[${esc(kw)}]</span>`
+    );
+
+    return applyHighlight(withKw, re).replace(/\n/g, '<br>');
+  }
+
+  function imageUrl(raw) {
+    const path = (raw || '').replace('../', '/');
+    return `/image?path=${encodeURIComponent(path)}`;
+  }
+
+  // ── keyword filter ────────────────────────────────────────────────────────
+
+  function setKeyword(kw) {
+    document.getElementById('keyword-filter').value = kw;
+    doSearch();
+  }
+
+  function clearKeyword() {
+    document.getElementById('keyword-filter').value = '';
+    doSearch();
+  }
+
+  // ── set / series filter ───────────────────────────────────────────────────
+
+  let allSets = [];
+
+  function seriesOf(set) { return set.replace(/\d+$/, '') || set; }
+
+  function activeSeries() {
+    return [...document.querySelectorAll('#series-btns .filter-btn.active')].map(b => b.dataset.series);
+  }
+
+  function updateSetDatalist() {
+    const active = activeSeries();
+    const dl = document.getElementById('set-list');
+    dl.innerHTML = '';
+    const visible = active.length ? allSets.filter(s => active.includes(seriesOf(s))) : allSets;
+    visible.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      dl.appendChild(opt);
+    });
+  }
+
+  function clearSet() {
+    document.getElementById('set-filter').value = '';
+    doSearch();
+  }
+
+  fetch('/sets').then(r => r.json()).then(sets => {
+    allSets = sets;
+
+    // Build series buttons dynamically
+    const seriesList = [...new Set(sets.map(seriesOf))].sort();
+    const container = document.getElementById('series-btns');
+    seriesList.forEach(sr => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.series = sr;
+      btn.textContent = sr;
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        updateSetDatalist();
+        // Clear set input if it no longer belongs to any active series
+        const setVal = document.getElementById('set-filter').value.trim();
+        const active = activeSeries();
+        if (setVal && active.length && !active.includes(seriesOf(setVal))) {
+          document.getElementById('set-filter').value = '';
+        }
+        doSearch();
+      });
+      container.appendChild(btn);
+    });
+
+    updateSetDatalist();
+  });
+
+  document.getElementById('set-filter').addEventListener('input', scheduleSearch);
+
+  // ── keyword filter ────────────────────────────────────────────────────────
+
+  fetch('/keywords').then(r => r.json()).then(kws => {
+    const dl = document.getElementById('keyword-list');
+    kws.forEach(kw => {
+      const opt = document.createElement('option');
+      opt.value = kw;
+      dl.appendChild(opt);
+    });
+  });
+
+  // ── event wiring ──────────────────────────────────────────────────────────
+
+  const queryEl  = document.getElementById('query');
+  const statusEl = document.getElementById('status');
+  const resultsEl = document.getElementById('results');
+  const kwEl     = document.getElementById('keyword-filter');
+
+  let debounce = null;
+  function scheduleSearch() {
+    clearTimeout(debounce);
+    debounce = setTimeout(doSearch, 300);
+  }
+
+  queryEl.addEventListener('input', scheduleSearch);
+  kwEl.addEventListener('input', scheduleSearch);  // fires as user types / selects from datalist
+
+  document.querySelectorAll('.filter-btn').forEach(btn =>
+    btn.addEventListener('click', () => { btn.classList.toggle('active'); doSearch(); })
+  );
+
+  document.querySelectorAll('.example-chip').forEach(chip =>
+    chip.addEventListener('click', () => { queryEl.value = chip.dataset.q; doSearch(); })
+  );
+
+  // ── card renderer ─────────────────────────────────────────────────────────
+
+  function renderCard(card, re) {
+    const div = document.createElement('div');
+    div.className = 'card';
+
+    const allArts = [card.image_url, ...(card.alt_arts || [])];
+
+    const colorBadges = (card.colors || [])
+      .map(c => `<span class="color-badge" style="background:${colorMap[c]||'#555'}">${c}</span>`)
+      .join('');
+
+    const typePills = (card.types || [])
+      .filter(t => t && t !== '-')
+      .map(t => `<span class="type-pill">${esc(t)}</span>`)
+      .join('');
+
+    const costStat = card.card_type === 'LEADER'
+      ? `<span class="stat"><label>Life</label>${card.life ?? '-'}</span>`
+      : `<span class="stat"><label>Cost</label>${card.cost ?? '-'}</span>`;
+
+    const triggerHtml = card.trigger && card.trigger !== '-'
+      ? `<div class="card-trigger"><strong>Trigger:</strong> ${renderText(card.trigger, re)}</div>`
+      : '';
+
+    div.innerHTML = `
+      <div class="art-wrap">
+        <img class="card-img" src="${imageUrl(card.image_url)}" alt="${esc(card.name)}" loading="lazy">
+        <div class="art-nav">
+          <button class="art-btn art-prev">&#8249;</button>
+          <span class="art-count"></span>
+          <button class="art-btn art-next">&#8250;</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="card-header">
+          <span class="card-name">${esc(card.name)}</span>
+          <span class="card-id">${esc(card.card_id)}</span>
+          <span class="badge type-${card.card_type.toLowerCase()}">${card.card_type}</span>
+          <span class="badge" style="background:#252540;color:#777">${esc(card.rarity)}</span>
+          ${colorBadges}
+        </div>
+        <div class="card-stats">
+          ${costStat}
+          <span class="stat"><label>Power</label>${card.power}</span>
+          <span class="stat"><label>Counter</label>${card.counter}</span>
+          <span class="stat"><label>Attr</label>${card.attribute}</span>
+        </div>
+        <div class="card-types">${typePills}</div>
+        <div class="card-text">${renderText(card.text, re)}</div>
+        ${triggerHtml}
+      </div>`;
+
+    // Zoom on hover
+    const imgEl = div.querySelector('.card-img');
+    imgEl.addEventListener('mouseenter', () => showZoom(imgEl));
+    imgEl.addEventListener('mouseleave', hideZoom);
+
+    // Art switcher — only shown when there are alternate arts.
+    if (allArts.length > 1) {
+      let idx = 0;
+      const img      = div.querySelector('.card-img');
+      const artNav   = div.querySelector('.art-nav');
+      const artCount = div.querySelector('.art-count');
+
+      artNav.style.display = 'flex';
+      artCount.textContent = `1/${allArts.length}`;
+
+      div.querySelector('.art-prev').addEventListener('click', () => {
+        idx = (idx - 1 + allArts.length) % allArts.length;
+        img.src = imageUrl(allArts[idx]);
+        artCount.textContent = `${idx + 1}/${allArts.length}`;
+      });
+
+      div.querySelector('.art-next').addEventListener('click', () => {
+        idx = (idx + 1) % allArts.length;
+        img.src = imageUrl(allArts[idx]);
+        artCount.textContent = `${idx + 1}/${allArts.length}`;
+      });
+    }
+
+    return div;
+  }
+
+  // ── search ────────────────────────────────────────────────────────────────
+
+  async function doSearch() {
+    const q       = queryEl.value.trim();
+    const colors  = [...document.querySelectorAll('.color-btn.active')].map(b => b.dataset.color);
+    const types   = [...document.querySelectorAll('.type-btn.active')].map(b => b.dataset.type);
+    const keyword = kwEl.value.trim();
+    const series  = activeSeries();
+    const set     = document.getElementById('set-filter').value.trim();
+
+    if (!q && !colors.length && !types.length && !keyword && !series.length && !set) {
+      queryEl.classList.remove('error');
+      statusEl.textContent = '';
+      statusEl.className   = '';
+      resultsEl.innerHTML  = '<p class="empty">Use the search box, filters, or click a keyword on any card to begin.</p>';
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (q)             params.set('q',       q);
+    if (colors.length) params.set('colors',  colors.join(','));
+    if (types.length)  params.set('types',   types.join(','));
+    if (keyword)       params.set('keyword', keyword);
+    if (series.length) params.set('series',  series.join(','));
+    if (set)           params.set('sets',    set);
+
+    let res, data;
+    try {
+      res  = await fetch(`/search?${params}`);
+      data = await res.json();
+    } catch {
+      statusEl.textContent = 'Network error';
+      statusEl.className   = 'err';
+      return;
+    }
+
+    if (!res.ok) {
+      queryEl.classList.add('error');
+      statusEl.textContent = data.error || 'Error';
+      statusEl.className   = 'err';
+      resultsEl.innerHTML  = '';
+      return;
+    }
+
+    queryEl.classList.remove('error');
+
+    let re = null;
+    if (q) try { re = new RegExp(q, 'gi'); } catch { /* invalid regex — skip highlight */ }
+
+    statusEl.className   = '';
+    statusEl.textContent = `${data.length} card${data.length !== 1 ? 's' : ''} matched`;
+    resultsEl.innerHTML  = '';
+
+    if (!data.length) {
+      resultsEl.innerHTML = '<p class="empty">No cards matched.</p>';
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    for (const card of data) frag.appendChild(renderCard(card, re));
+    resultsEl.appendChild(frag);
+  }
+</script>
+
+</body>
+</html>
