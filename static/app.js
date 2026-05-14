@@ -557,6 +557,18 @@ function wireChipInput(inputEl, filter, target) {
   inputEl.addEventListener('focus',  () => openChipDropdown(filter, target));
   inputEl.addEventListener('input',  () => buildChipDropdown(inputEl.value));
   inputEl.addEventListener('blur',   () => setTimeout(closeChipDropdown, 200));
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const text = inputEl.value.trim();
+      if (text) {
+        filter.add(text, target);
+        inputEl.value = '';
+        buildChipDropdown('');
+        doSearch();
+      }
+    }
+  });
   inputEl.removeAttribute('readonly');
 }
 

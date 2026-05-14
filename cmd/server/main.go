@@ -216,9 +216,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	excludeRotated := r.URL.Query().Get("exclude_rotated") == "1"
 
 	if q == "" && colorsParam == "" && typesParam == "" && keywordParam == "" &&
-		keywordExclude == "" && costParam == "" && costExclude == "" &&
-		setsParam == "" && seriesParam == "" &&
-		tagsIncludeParam == "" && tagsExcludeParam == "" && !excludeRotated {
+		keywordExclude == "" && costParam == "" && costExclude == "" && setsParam == "" &&
+		seriesParam == "" && tagsIncludeParam == "" && tagsExcludeParam == "" && !excludeRotated {
 		writeJSON(w, []CardResult{})
 		return
 	}
@@ -236,9 +235,17 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	keywords := splitList(keywordParam)
 	keywordExcludes := splitList(keywordExclude)
 	keywordOR := keywordMode == "or"
-	costIncludes := splitList(costParam)
-	costExcludes := splitList(costExclude)
 	costOR := costMode == "or"
+	costIncludeREs, err := compileRegexList(splitList(costParam))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid cost regex: "+err.Error())
+		return
+	}
+	costExcludeREs, err := compileRegexList(splitList(costExclude))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid cost_exclude regex: "+err.Error())
+		return
+	}
 
 	filterColors := splitParam(colorsParam)
 	filterTypes := splitParam(typesParam)
@@ -319,14 +326,14 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			if filterTagsExclude != nil && anyMatch(card.Types, filterTagsExclude) {
 				continue
 			}
-			if len(costIncludes) > 0 || len(costExcludes) > 0 {
+			if len(costIncludeREs) > 0 || len(costExcludeREs) > 0 {
 				costText := extractEffectCosts(plain) + " " + extractEffectCosts(plainTrigger)
 				passed := true
-				if passed && len(costIncludes) > 0 {
+				if passed && len(costIncludeREs) > 0 {
 					if costOR {
 						found := false
-						for _, c := range costIncludes {
-							if strings.Contains(costText, c) {
+						for _, re := range costIncludeREs {
+							if re.MatchString(costText) {
 								found = true
 								break
 							}
@@ -335,8 +342,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 							passed = false
 						}
 					} else {
-						for _, c := range costIncludes {
-							if !strings.Contains(costText, c) {
+						for _, re := range costIncludeREs {
+							if !re.MatchString(costText) {
 								passed = false
 								break
 							}
@@ -344,8 +351,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 				if passed {
-					for _, c := range costExcludes {
-						if strings.Contains(costText, c) {
+					for _, re := range costExcludeREs {
+						if re.MatchString(costText) {
 							passed = false
 							break
 						}
@@ -368,6 +375,19 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		results = append(results, *grouped[id])
 	}
 	writeJSON(w, results)
+}
+
+// compileRegexList compiles a slice of pattern strings into case-insensitive regexps.
+func compileRegexList(patterns []string) ([]*regexp.Regexp, error) {
+	res := make([]*regexp.Regexp, 0, len(patterns))
+	for _, p := range patterns {
+		re, err := regexp.Compile("(?i)" + p)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, re)
+	}
+	return res, nil
 }
 
 // splitList splits a comma-separated param into a trimmed string slice, or nil if empty.
