@@ -205,6 +205,7 @@ function setupArtSwitcher(cardEl, allArts) {
 function renderCard(card, searchRegex) {
   const cardEl = document.createElement('div');
   cardEl.className = 'card';
+  if (card.colors && card.colors.length > 0) cardEl.dataset.color = card.colors[0];
 
   const fullText = stripHtml(card.text) + ' ' + stripHtml(card.trigger || '');
   if (isLeaderIncompatible(fullText)) cardEl.classList.add('leader-incompatible');
