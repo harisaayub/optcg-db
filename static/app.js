@@ -120,11 +120,7 @@ function clearKeywordExclude() {
 
 // ── Series / set filter ──────────────────────────────────────────────────────
 
-let allSets = [];
-
-function seriesOf(setCode) {
-  return setCode.replace(/\d+$/, '') || setCode;
-}
+let allSets = []; // SetEntry objects: { code, series, rotated }
 
 function activeSeries() {
   return [...document.querySelectorAll('#series-btns .filter-btn.active')]
@@ -136,11 +132,11 @@ function updateSetDatalist() {
   const setDatalist = document.getElementById('set-list');
   setDatalist.innerHTML = '';
   const visible = active.length
-    ? allSets.filter(s => active.includes(seriesOf(s)))
+    ? allSets.filter(s => active.includes(s.series))
     : allSets;
   visible.forEach(s => {
     const opt = document.createElement('option');
-    opt.value = s;
+    opt.value = s.code;
     setDatalist.appendChild(opt);
   });
 }
@@ -300,7 +296,7 @@ async function doSearch() {
 
   let res, data;
   try {
-    res  = await fetch(`/search?${params}`);
+    res  = await fetch(`/api/search?${params}`);
     data = await res.json();
   } catch {
     statusBar.textContent = 'Network error';
@@ -424,19 +420,62 @@ function clearTags() {
 
 // ── API loaders ──────────────────────────────────────────────────────────────
 
-function loadKeywords() {
-  fetch('/keywords').then(r => r.json()).then(keywords => {
+// loadMeta fetches /api/meta once to populate sets, keywords, and types.
+function loadMeta() {
+  fetch('/api/meta').then(r => r.json()).then(({ sets, keywords, types }) => {
+    // Keywords datalist
     const keywordDatalist = document.getElementById('keyword-list');
     keywords.forEach(kw => {
       const opt = document.createElement('option');
       opt.value = kw;
       keywordDatalist.appendChild(opt);
     });
+
+    // Sets — store as SetEntry objects, build series buttons
+    allSets = sets;
+    const seriesList = [...new Set(sets.map(s => s.series))].sort();
+    const seriesBtns = document.getElementById('series-btns');
+    seriesList.forEach(sr => {
+      const btn = document.createElement('button');
+      btn.className      = 'filter-btn';
+      btn.dataset.series = sr;
+      btn.textContent    = sr;
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        updateSetDatalist();
+        const setVal = setInput.value.trim();
+        const active = activeSeries();
+        const currentSet = allSets.find(s => s.code === setVal);
+        if (currentSet && active.length && !active.includes(currentSet.series)) {
+          setInput.value = '';
+        }
+        doSearch();
+      });
+      seriesBtns.appendChild(btn);
+    });
+    updateSetDatalist();
+
+    // Types (archetype tag buttons)
+    const tagList = document.getElementById('tag-list');
+    types.forEach(({ name, count }) => {
+      const btn = document.createElement('button');
+      btn.className = 'tag-btn';
+      btn.dataset.name = name;
+      btn.innerHTML = `${escapeHtml(name)}<span class="tag-count">${count}</span>`;
+      btn.addEventListener('click', () => cycleTagState(name, btn));
+      tagList.appendChild(btn);
+    });
+    document.getElementById('tag-search').addEventListener('input', () => {
+      const q = document.getElementById('tag-search').value.toLowerCase();
+      document.querySelectorAll('.tag-btn').forEach(btn => {
+        btn.style.display = btn.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
   });
 }
 
 function loadLeaders() {
-  fetch('/search?types=LEADER')
+  fetch('/api/leaders')
     .then(r => r.json())
     .then(leaders => { allLeaders = leaders; });
 }
@@ -493,54 +532,6 @@ function buildLeaderDropdown(query) {
   dropdown.hidden = false;
 }
 
-function loadTypes() {
-  fetch('/types').then(r => r.json()).then(types => {
-    const tagList = document.getElementById('tag-list');
-    types.forEach(({ name, count }) => {
-      const btn = document.createElement('button');
-      btn.className = 'tag-btn';
-      btn.dataset.name = name;
-      btn.innerHTML = `${escapeHtml(name)}<span class="tag-count">${count}</span>`;
-      btn.addEventListener('click', () => cycleTagState(name, btn));
-      tagList.appendChild(btn);
-    });
-
-    document.getElementById('tag-search').addEventListener('input', () => {
-      const q = document.getElementById('tag-search').value.toLowerCase();
-      document.querySelectorAll('.tag-btn').forEach(btn => {
-        btn.style.display = btn.dataset.name.toLowerCase().includes(q) ? '' : 'none';
-      });
-    });
-  });
-}
-
-function loadSets() {
-  fetch('/sets').then(r => r.json()).then(sets => {
-    allSets = sets;
-
-    const seriesList = [...new Set(sets.map(seriesOf))].sort();
-    const seriesBtns = document.getElementById('series-btns');
-    seriesList.forEach(sr => {
-      const btn = document.createElement('button');
-      btn.className      = 'filter-btn';
-      btn.dataset.series = sr;
-      btn.textContent    = sr;
-      btn.addEventListener('click', () => {
-        btn.classList.toggle('active');
-        updateSetDatalist();
-        const setVal = setInput.value.trim();
-        const active = activeSeries();
-        if (setVal && active.length && !active.includes(seriesOf(setVal))) {
-          setInput.value = '';
-        }
-        doSearch();
-      });
-      seriesBtns.appendChild(btn);
-    });
-
-    updateSetDatalist();
-  });
-}
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 
@@ -596,9 +587,7 @@ function init() {
     if (!leaderDropdown.hidden) positionLeaderDropdown();
   });
 
-  loadKeywords();
-  loadSets();
-  loadTypes();
+  loadMeta();
   loadLeaders();
 }
 
