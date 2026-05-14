@@ -25,7 +25,7 @@ def scrape_by_color():
         color_btn = driver.find_element(By.ID, f"color_{color}")
         driver.execute_script("arguments[0].click();", color_btn) # select color
         submit_btn = driver.find_element(By.CSS_SELECTOR, 'div.commonBtn.submitBtn input[type="submit"]')
-        submit_btn.click() # search and then wait until loads
+        driver.execute_script("arguments[0].click();", submit_btn) # search and then wait until loads
         result_col = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "resultCol")))
         color_btn = driver.find_element(By.ID, f"color_{color}") # selenium complains about the first button becoming stale
         driver.execute_script("arguments[0].click();", color_btn) # unselect color
@@ -75,13 +75,13 @@ def scrape(result_col):
                 child_json['rarity'] = 'ALT L'
         else:
             child_json['cost'] = cost[0].get_attribute("innerHTML").split('>')[-1]
-        child_json['attribute'] = remove_html_tags(attribute[0].get_attribute("innerHTML").split()[-1]).split('>')[-1]
-        child_json['power'] = power[0].get_attribute("innerHTML").split('>')[-1]
-        child_json['counter'] = counter[0].get_attribute("innerHTML").split('>')[-1]
-        child_json['colors'] = color[0].get_attribute("innerHTML").split('>')[-1].split('/')
-        child_json['types'] = feature[0].get_attribute("innerHTML").split('>')[-1].split('/')
-        child_json['text'] = text[0].get_attribute("innerHTML")[15:]
-        child_json['art_set'] = getInfo[0].get_attribute("innerHTML")[20:]
+        child_json['attribute'] = remove_html_tags(attribute[0].get_attribute("innerHTML").split()[-1]).split('>')[-1] if attribute else '-'
+        child_json['power'] = power[0].get_attribute("innerHTML").split('>')[-1] if power else '-'
+        child_json['counter'] = counter[0].get_attribute("innerHTML").split('>')[-1] if counter else '-'
+        child_json['colors'] = color[0].get_attribute("innerHTML").split('>')[-1].split('/') if color else []
+        child_json['types'] = feature[0].get_attribute("innerHTML").split('>')[-1].split('/') if feature else []
+        child_json['text'] = text[0].get_attribute("innerHTML")[15:] if text else ''
+        child_json['art_set'] = getInfo[0].get_attribute("innerHTML")[20:] if getInfo else ''
         child_json['image_url'] = img
         child_json['trigger'] = '-'
         if trigger:
@@ -91,5 +91,5 @@ def scrape(result_col):
 
 card_dict = scrape_by_color()
 #pprint.pprint(card_dict[:10], indent=2)
-with open('card_list.json', 'w') as outfile:
+with open('../card_list.json', 'w') as outfile:
     json.dump(card_dict, outfile, indent=2)
