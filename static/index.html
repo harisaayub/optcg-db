@@ -58,11 +58,24 @@
         <button id="keyword-mode-btn" class="filter-btn keyword-mode-btn" title="Toggle AND / OR logic for keyword includes">ALL</button>
         <div class="chip-input-wrap" id="keyword-include-wrap">
           <input id="keyword-filter" class="chip-text-input" placeholder="add keyword…" autocomplete="off" spellcheck="false" readonly>
-          <datalist id="keyword-list"></datalist>
         </div>
         <span class="filter-label">not</span>
         <div class="chip-input-wrap" id="keyword-exclude-wrap">
           <input id="keyword-exclude" class="chip-text-input" placeholder="add keyword…" autocomplete="off" spellcheck="false" readonly>
+        </div>
+      </div>
+
+      <div class="filter-sep"></div>
+
+      <div class="filter-group">
+        <span class="filter-label">Effect cost</span>
+        <button id="cost-mode-btn" class="filter-btn keyword-mode-btn" title="Toggle AND / OR logic for cost includes">ALL</button>
+        <div class="chip-input-wrap" id="cost-include-wrap">
+          <input id="cost-filter" class="chip-text-input" placeholder="add cost…" autocomplete="off" spellcheck="false" readonly>
+        </div>
+        <span class="filter-label">not</span>
+        <div class="chip-input-wrap" id="cost-exclude-wrap">
+          <input id="cost-exclude" class="chip-text-input" placeholder="add cost…" autocomplete="off" spellcheck="false" readonly>
         </div>
       </div>
     </div>
@@ -119,7 +132,7 @@
 
 <img id="art-zoom" alt="">
 <div id="leader-dropdown" class="leader-dropdown" hidden></div>
-<div id="keyword-dropdown" class="keyword-dropdown" hidden></div>
+<div id="chip-dropdown" class="keyword-dropdown" hidden></div>
 
 <script src="app.js"></script>
 

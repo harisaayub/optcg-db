@@ -270,7 +270,7 @@ function showEmptyState(message) {
 async function doSearch() {
   const { q, colors, types, series, set, excludeRotated, tagsInclude, tagsExclude } = buildSearchParams();
 
-  if (!q && !colors.length && !types.length && !keywordIncludes.length && !keywordExcludes.length
+  if (!q && !colors.length && !types.length && keywordFilter.isEmpty() && costFilter.isEmpty()
       && !series.length && !set && !excludeRotated && !tagsInclude.length && !tagsExclude.length) {
     searchInput.classList.remove('error');
     statusBar.textContent = '';
@@ -280,19 +280,16 @@ async function doSearch() {
   }
 
   const params = new URLSearchParams();
-  if (q)                      params.set('q',               q);
-  if (colors.length)          params.set('colors',          colors.join(','));
-  if (types.length)           params.set('types',           types.join(','));
-  if (keywordIncludes.length) {
-    params.set('keyword',      keywordIncludes.join(','));
-    if (keywordMode === 'or')  params.set('keyword_mode', 'or');
-  }
-  if (keywordExcludes.length) params.set('keyword_exclude', keywordExcludes.join(','));
-  if (series.length)          params.set('series',          series.join(','));
-  if (set)                    params.set('sets',            set);
-  if (excludeRotated)         params.set('exclude_rotated', '1');
-  if (tagsInclude.length)     params.set('tags_include',    tagsInclude.join(','));
-  if (tagsExclude.length)     params.set('tags_exclude',    tagsExclude.join(','));
+  if (q)              params.set('q',      q);
+  if (colors.length)  params.set('colors', colors.join(','));
+  if (types.length)   params.set('types',  types.join(','));
+  keywordFilter.buildParams(params);
+  costFilter.buildParams(params);
+  if (series.length)  params.set('series', series.join(','));
+  if (set)            params.set('sets',   set);
+  if (excludeRotated)           params.set('exclude_rotated', '1');
+  if (tagsInclude.length)       params.set('tags_include',    tagsInclude.join(','));
+  if (tagsExclude.length)       params.set('tags_exclude',    tagsExclude.join(','));
 
   let res, data;
   try {
@@ -418,117 +415,168 @@ function clearTags() {
   doSearch();
 }
 
-// ── Keyword chip filter ───────────────────────────────────────────────────────
+// ── Generic chip filter ───────────────────────────────────────────────────────
 
-let keywordIncludes = []; // chips in the "has" group
-let keywordExcludes = []; // chips in the "not" group
-let keywordMode     = 'and'; // 'and' | 'or' — logic for include chips
-let allKeywords     = []; // populated by loadMeta
+class ChipFilter {
+  constructor(id, apiParam) {
+    this.id       = id;
+    this.apiParam = apiParam;
+    this.includes = [];
+    this.excludes = [];
+    this.mode     = 'and'; // 'and' | 'or' for include logic
+    this.items    = [];    // string[] or {text,count}[]
+  }
 
-function renderKeywordChips() {
-  const includeWrap = document.getElementById('keyword-include-wrap');
-  const excludeWrap = document.getElementById('keyword-exclude-wrap');
-  const includeInput = document.getElementById('keyword-filter');
-  const excludeInput = document.getElementById('keyword-exclude');
+  setItems(items) { this.items = items; }
 
-  includeWrap.querySelectorAll('.keyword-chip').forEach(c => c.remove());
-  excludeWrap.querySelectorAll('.keyword-chip').forEach(c => c.remove());
+  itemText(item) { return typeof item === 'string' ? item : item.text; }
 
-  keywordIncludes.forEach(kw => includeWrap.insertBefore(makeKeywordChip(kw, 'include'), includeInput));
-  keywordExcludes.forEach(kw => excludeWrap.insertBefore(makeKeywordChip(kw, 'exclude'), excludeInput));
+  add(text, target) {
+    const arr = target === 'include' ? this.includes : this.excludes;
+    if (arr.includes(text)) return false;
+    arr.push(text);
+    this._render();
+    return true;
+  }
+
+  remove(text, target) {
+    const arr = target === 'include' ? this.includes : this.excludes;
+    const i = arr.indexOf(text);
+    if (i >= 0) arr.splice(i, 1);
+    this._render();
+  }
+
+  _render() {
+    for (const target of ['include', 'exclude']) {
+      const inputId = target === 'include' ? `${this.id}-filter` : `${this.id}-exclude`;
+      const wrap    = document.getElementById(`${this.id}-${target}-wrap`);
+      const input   = document.getElementById(inputId);
+      wrap.querySelectorAll('.keyword-chip').forEach(c => c.remove());
+      (target === 'include' ? this.includes : this.excludes).forEach(text => {
+        wrap.insertBefore(this._makeChip(text, target), input);
+      });
+    }
+  }
+
+  _makeChip(text, target) {
+    const chip = document.createElement('span');
+    chip.className = `keyword-chip ${target}`;
+    const label = document.createElement('span');
+    label.textContent = text;
+    const btn = document.createElement('button');
+    btn.textContent = '×';
+    btn.addEventListener('mousedown', e => e.preventDefault());
+    btn.addEventListener('click', () => { this.remove(text, target); doSearch(); });
+    chip.append(label, btn);
+    return chip;
+  }
+
+  buildParams(params) {
+    if (this.includes.length) {
+      params.set(this.apiParam, this.includes.join(','));
+      if (this.mode === 'or') params.set(`${this.apiParam}_mode`, 'or');
+    }
+    if (this.excludes.length) {
+      params.set(`${this.apiParam}_exclude`, this.excludes.join(','));
+    }
+  }
+
+  isEmpty() { return !this.includes.length && !this.excludes.length; }
 }
 
-function makeKeywordChip(kw, type) {
-  const chip  = document.createElement('span');
-  chip.className = `keyword-chip ${type}`;
-  const label = document.createElement('span');
-  label.textContent = kw;
-  const btn   = document.createElement('button');
-  btn.textContent = '×';
-  btn.addEventListener('mousedown', e => e.preventDefault());
-  btn.addEventListener('click', () => {
-    const arr = type === 'include' ? keywordIncludes : keywordExcludes;
-    arr.splice(arr.indexOf(kw), 1);
-    renderKeywordChips();
-    doSearch();
-  });
-  chip.appendChild(label);
-  chip.appendChild(btn);
-  return chip;
+const keywordFilter = new ChipFilter('keyword', 'keyword');
+const costFilter    = new ChipFilter('cost', 'cost');
+
+// ── Shared chip dropdown ──────────────────────────────────────────────────────
+
+let activeChipFilter = null; // ChipFilter currently driving the dropdown
+let activeChipTarget = null; // 'include' | 'exclude'
+
+function positionChipDropdown() {
+  const wrapId = `${activeChipFilter.id}-${activeChipTarget}-wrap`;
+  const rect   = document.getElementById(wrapId).getBoundingClientRect();
+  const dd     = document.getElementById('chip-dropdown');
+  dd.style.top      = (rect.bottom + 4) + 'px';
+  dd.style.left     = rect.left + 'px';
+  dd.style.minWidth = Math.max(220, rect.width) + 'px';
 }
 
-// ── Keyword dropdown ──────────────────────────────────────────────────────────
+function buildChipDropdown(query) {
+  const dd = document.getElementById('chip-dropdown');
+  if (!activeChipFilter) { dd.hidden = true; return; }
 
-let activeKeywordTarget = null; // 'include' | 'exclude'
-
-function positionKeywordDropdown() {
-  const inputId  = activeKeywordTarget === 'include' ? 'keyword-filter' : 'keyword-exclude';
-  const wrap     = document.getElementById(
-    activeKeywordTarget === 'include' ? 'keyword-include-wrap' : 'keyword-exclude-wrap'
-  );
-  const rect     = wrap.getBoundingClientRect();
-  const dropdown = document.getElementById('keyword-dropdown');
-  dropdown.style.top      = (rect.bottom + 4) + 'px';
-  dropdown.style.left     = rect.left + 'px';
-  dropdown.style.minWidth = Math.max(220, rect.width) + 'px';
-}
-
-function buildKeywordDropdown(query) {
-  const dropdown = document.getElementById('keyword-dropdown');
-  if (!activeKeywordTarget) { dropdown.hidden = true; return; }
-
-  const q = query.toLowerCase();
-  const current = activeKeywordTarget === 'include' ? keywordIncludes : keywordExcludes;
-
+  const current  = activeChipTarget === 'include' ? activeChipFilter.includes : activeChipFilter.excludes;
+  const q        = query.toLowerCase();
   const filtered = (q
-    ? allKeywords.filter(kw => kw.toLowerCase().includes(q))
-    : allKeywords
+    ? activeChipFilter.items.filter(it => activeChipFilter.itemText(it).toLowerCase().includes(q))
+    : activeChipFilter.items
   ).slice(0, 60);
 
-  if (!filtered.length) { dropdown.hidden = true; return; }
+  if (!filtered.length) { dd.hidden = true; return; }
 
-  dropdown.innerHTML = '';
-  filtered.forEach(kw => {
-    const item = document.createElement('div');
-    item.className = 'keyword-option' + (current.includes(kw) ? ' already-added' : '');
-    item.textContent = kw;
-    item.addEventListener('mousedown', e => e.preventDefault());
-    item.addEventListener('click', () => {
-      if (current.includes(kw)) return;
-      current.push(kw);
-      renderKeywordChips();
-      // clear the search input and keep dropdown open for more selections
-      const searchEl = document.getElementById(
-        activeKeywordTarget === 'include' ? 'keyword-filter' : 'keyword-exclude'
-      );
-      searchEl.value = '';
-      buildKeywordDropdown('');
+  dd.innerHTML = '';
+  filtered.forEach(it => {
+    const text = activeChipFilter.itemText(it);
+    const el   = document.createElement('div');
+    el.className   = 'keyword-option' + (current.includes(text) ? ' already-added' : '');
+    el.textContent = text;
+    el.addEventListener('mousedown', e => e.preventDefault());
+    el.addEventListener('click', () => {
+      if (current.includes(text)) return;
+      activeChipFilter.add(text, activeChipTarget);
+      const inputId = activeChipTarget === 'include'
+        ? `${activeChipFilter.id}-filter` : `${activeChipFilter.id}-exclude`;
+      document.getElementById(inputId).value = '';
+      buildChipDropdown('');
       doSearch();
     });
-    dropdown.appendChild(item);
+    dd.appendChild(el);
   });
 
-  positionKeywordDropdown();
-  dropdown.hidden = false;
+  positionChipDropdown();
+  dd.hidden = false;
 }
 
-function openKeywordDropdown(target) {
-  activeKeywordTarget = target;
-  buildKeywordDropdown('');
+function openChipDropdown(filter, target) {
+  activeChipFilter = filter;
+  activeChipTarget = target;
+  buildChipDropdown('');
 }
 
-function closeKeywordDropdown() {
-  activeKeywordTarget = null;
-  document.getElementById('keyword-dropdown').hidden = true;
+function closeChipDropdown() {
+  activeChipFilter = null;
+  activeChipTarget = null;
+  document.getElementById('chip-dropdown').hidden = true;
+}
+
+function wireChipInput(inputEl, filter, target) {
+  inputEl.closest('.chip-input-wrap').addEventListener('click', () => {
+    inputEl.focus();
+    openChipDropdown(filter, target);
+  });
+  inputEl.addEventListener('focus',  () => openChipDropdown(filter, target));
+  inputEl.addEventListener('input',  () => buildChipDropdown(inputEl.value));
+  inputEl.addEventListener('blur',   () => setTimeout(closeChipDropdown, 200));
+  inputEl.removeAttribute('readonly');
+}
+
+function wireModeBtn(btnEl, filter) {
+  btnEl.addEventListener('click', () => {
+    filter.mode = filter.mode === 'and' ? 'or' : 'and';
+    btnEl.textContent = filter.mode === 'and' ? 'ALL' : 'ANY';
+    btnEl.classList.toggle('or-mode', filter.mode === 'or');
+    if (filter.includes.length) doSearch();
+  });
 }
 
 // ── API loaders ──────────────────────────────────────────────────────────────
 
 // loadMeta fetches /api/meta once to populate sets, keywords, and types.
 function loadMeta() {
-  fetch('/api/meta').then(r => r.json()).then(({ sets, keywords, types }) => {
-    // Keywords — stored for the custom dropdown
-    allKeywords = keywords;
+  fetch('/api/meta').then(r => r.json()).then(({ sets, keywords, types, costs }) => {
+    // Keywords and costs — populate chip filter dropdowns
+    keywordFilter.setItems(keywords);
+    costFilter.setItems(costs);
 
     // Sets — store as SetEntry objects, build series buttons
     allSets = sets;
@@ -657,39 +705,23 @@ function init() {
   searchInput.addEventListener('input', scheduleSearch);
   setInput.addEventListener('input', scheduleSearch);
 
-  // Keyword chip inputs — open custom dropdown on click/focus, filter on type
-  const kwIncludeInput = document.getElementById('keyword-filter');
-  const kwExcludeInput = document.getElementById('keyword-exclude');
-  const kwDropdown     = document.getElementById('keyword-dropdown');
+  // Keyword chip inputs
+  wireChipInput(document.getElementById('keyword-filter'), keywordFilter, 'include');
+  wireChipInput(document.getElementById('keyword-exclude'), keywordFilter, 'exclude');
+  wireModeBtn(document.getElementById('keyword-mode-btn'), keywordFilter);
 
-  function wireKeywordInput(input, target) {
-    // Make the whole wrap clickable to open the dropdown
-    input.closest('.chip-input-wrap').addEventListener('click', () => {
-      input.focus();
-      openKeywordDropdown(target);
-    });
-    input.addEventListener('focus', () => openKeywordDropdown(target));
-    input.addEventListener('input',  () => buildKeywordDropdown(input.value));
-    input.addEventListener('blur',   () => setTimeout(closeKeywordDropdown, 200));
-    input.removeAttribute('readonly'); // allow typing to filter
-  }
-  wireKeywordInput(kwIncludeInput, 'include');
-  wireKeywordInput(kwExcludeInput, 'exclude');
+  // Cost chip inputs
+  wireChipInput(document.getElementById('cost-filter'), costFilter, 'include');
+  wireChipInput(document.getElementById('cost-exclude'), costFilter, 'exclude');
+  wireModeBtn(document.getElementById('cost-mode-btn'), costFilter);
 
+  // Shared chip dropdown repositioning
+  const chipDropdown = document.getElementById('chip-dropdown');
   window.addEventListener('scroll', () => {
-    if (!kwDropdown.hidden) positionKeywordDropdown();
+    if (!chipDropdown.hidden) positionChipDropdown();
   }, { passive: true });
   window.addEventListener('resize', () => {
-    if (!kwDropdown.hidden) positionKeywordDropdown();
-  });
-
-  // AND/OR mode toggle
-  const keywordModeBtn = document.getElementById('keyword-mode-btn');
-  keywordModeBtn.addEventListener('click', () => {
-    keywordMode = keywordMode === 'and' ? 'or' : 'and';
-    keywordModeBtn.textContent = keywordMode === 'and' ? 'ALL' : 'ANY';
-    keywordModeBtn.classList.toggle('or-mode', keywordMode === 'or');
-    if (keywordIncludes.length) doSearch();
+    if (!chipDropdown.hidden) positionChipDropdown();
   });
 
   document.querySelectorAll('.filter-btn').forEach(btn =>

@@ -51,11 +51,18 @@ type TypeEntry struct {
 	Count int    `json:"count"`
 }
 
+// CostEntry is returned by /api/costs: a distinct effect-cost pattern and how often it appears.
+type CostEntry struct {
+	Text  string `json:"text"`
+	Count int    `json:"count"`
+}
+
 // MetaResponse is returned by /api/meta for client bootstrap.
 type MetaResponse struct {
 	Sets     []SetEntry  `json:"sets"`
 	Keywords []string    `json:"keywords"`
 	Types    []TypeEntry `json:"types"`
+	Costs    []CostEntry `json:"costs"`
 }
 
 // ── Global state ──────────────────────────────────────────────────────────────
@@ -65,6 +72,7 @@ var cards []Card
 var (
 	htmlTagRe = regexp.MustCompile(`<[^>]+>`)
 	keywordRe = regexp.MustCompile(`\[[^\]]+\]`)
+	donRe     = regexp.MustCompile(`[①②③④⑤⑥⑦⑧⑨⑩]+`)
 )
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -107,6 +115,26 @@ func isRotated(setCode string) bool {
 		return err == nil && n < 10
 	}
 	return false
+}
+
+// extractEffectCosts returns the cost portions of all effects in plain card text.
+// It strips [keyword] brackets (removing internal colons like Activate:Main),
+// then collects the text before each remaining ':' separator. Multiple effects
+// in one text block are separated by '.', so we take the last sentence before ':'.
+func extractEffectCosts(plain string) string {
+	stripped := keywordRe.ReplaceAllString(plain, "")
+	parts := strings.Split(stripped, ":")
+	var costs []string
+	for i := 0; i < len(parts)-1; i++ {
+		seg := parts[i]
+		if dot := strings.LastIndex(seg, "."); dot >= 0 {
+			seg = seg[dot+1:]
+		}
+		if seg = strings.TrimSpace(seg); seg != "" {
+			costs = append(costs, seg)
+		}
+	}
+	return strings.Join(costs, " ")
 }
 
 func writeJSON(w http.ResponseWriter, v any) {
@@ -156,6 +184,7 @@ func main() {
 	mux.HandleFunc("GET /api/sets", withCORS(setsHandler))
 	mux.HandleFunc("GET /api/keywords", withCORS(keywordsHandler))
 	mux.HandleFunc("GET /api/types", withCORS(typesHandler))
+	mux.HandleFunc("GET /api/costs", withCORS(costsHandler))
 	mux.HandleFunc("GET /api/meta", withCORS(metaHandler))
 	// OPTIONS preflight catch-all for the /api/ subtree
 	mux.HandleFunc("OPTIONS /api/", withCORS(func(w http.ResponseWriter, r *http.Request) {}))
@@ -177,6 +206,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	keywordParam := r.URL.Query().Get("keyword")
 	keywordMode := r.URL.Query().Get("keyword_mode") // "and" (default) or "or"
 	keywordExclude := r.URL.Query().Get("keyword_exclude")
+	costParam := r.URL.Query().Get("cost")
+	costMode := r.URL.Query().Get("cost_mode")
+	costExclude := r.URL.Query().Get("cost_exclude")
 	setsParam := r.URL.Query().Get("sets")
 	seriesParam := r.URL.Query().Get("series")
 	tagsIncludeParam := r.URL.Query().Get("tags_include")
@@ -184,7 +216,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	excludeRotated := r.URL.Query().Get("exclude_rotated") == "1"
 
 	if q == "" && colorsParam == "" && typesParam == "" && keywordParam == "" &&
-		keywordExclude == "" && setsParam == "" && seriesParam == "" &&
+		keywordExclude == "" && costParam == "" && costExclude == "" &&
+		setsParam == "" && seriesParam == "" &&
 		tagsIncludeParam == "" && tagsExcludeParam == "" && !excludeRotated {
 		writeJSON(w, []CardResult{})
 		return
@@ -203,6 +236,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	keywords := splitList(keywordParam)
 	keywordExcludes := splitList(keywordExclude)
 	keywordOR := keywordMode == "or"
+	costIncludes := splitList(costParam)
+	costExcludes := splitList(costExclude)
+	costOR := costMode == "or"
 
 	filterColors := splitParam(colorsParam)
 	filterTypes := splitParam(typesParam)
@@ -282,6 +318,42 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			if filterTagsExclude != nil && anyMatch(card.Types, filterTagsExclude) {
 				continue
+			}
+			if len(costIncludes) > 0 || len(costExcludes) > 0 {
+				costText := extractEffectCosts(plain) + " " + extractEffectCosts(plainTrigger)
+				passed := true
+				if passed && len(costIncludes) > 0 {
+					if costOR {
+						found := false
+						for _, c := range costIncludes {
+							if strings.Contains(costText, c) {
+								found = true
+								break
+							}
+						}
+						if !found {
+							passed = false
+						}
+					} else {
+						for _, c := range costIncludes {
+							if !strings.Contains(costText, c) {
+								passed = false
+								break
+							}
+						}
+					}
+				}
+				if passed {
+					for _, c := range costExcludes {
+						if strings.Contains(costText, c) {
+							passed = false
+							break
+						}
+					}
+				}
+				if !passed {
+					continue
+				}
 			}
 
 			grouped[card.CardID] = &CardResult{Card: card, AltArts: []string{}}
@@ -465,7 +537,7 @@ func metaHandler(w http.ResponseWriter, r *http.Request) {
 	for code := range seenSets {
 		sets = append(sets, SetEntry{
 			Code:    code,
-			Series:  cardSeries(code + "-"),
+			Series:  seriesFromSetCode(code),
 			Rotated: isRotated(code),
 		})
 	}
@@ -513,7 +585,56 @@ func metaHandler(w http.ResponseWriter, r *http.Request) {
 		return types[i].Name < types[j].Name
 	})
 
-	writeJSON(w, MetaResponse{Sets: sets, Keywords: keywords, Types: types})
+	costs := computeCosts()
+	writeJSON(w, MetaResponse{Sets: sets, Keywords: keywords, Types: types, Costs: costs})
+}
+
+// ── Costs ─────────────────────────────────────────────────────────────────────
+
+// computeCosts extracts and counts distinct effect-cost patterns across all cards.
+// DON!! cost indicators (circled digits) are stripped so "① Rest this Character"
+// and "② Rest this Character" both become "Rest this Character".
+func computeCosts() []CostEntry {
+	counts := make(map[string]int)
+	seen := make(map[string]bool)
+	for _, card := range cards {
+		if seen[card.CardID] {
+			continue
+		}
+		seen[card.CardID] = true
+		plain := plainText(card.Text)
+		stripped := keywordRe.ReplaceAllString(plain, "")
+		parts := strings.Split(stripped, ":")
+		for i := 0; i < len(parts)-1; i++ {
+			seg := parts[i]
+			if dot := strings.LastIndex(seg, "."); dot >= 0 {
+				seg = seg[dot+1:]
+			}
+			// Strip DON!! cost indicators and surrounding parentheses/symbols
+			// so "① Rest" and "(1) Rest" normalise to the same cost string.
+			seg = donRe.ReplaceAllString(seg, "")
+			seg = strings.Trim(strings.TrimSpace(seg), "()+-")
+			if seg != "" && seg != "-" {
+				counts[seg]++
+			}
+		}
+	}
+	result := make([]CostEntry, 0, len(counts))
+	for text, count := range counts {
+		result = append(result, CostEntry{Text: text, Count: count})
+	}
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].Count != result[j].Count {
+			return result[i].Count > result[j].Count
+		}
+		return result[i].Text < result[j].Text
+	})
+	return result
+}
+
+// costsHandler is the dedicated /api/costs endpoint.
+func costsHandler(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, computeCosts())
 }
 
 // ── Image proxy ───────────────────────────────────────────────────────────────
