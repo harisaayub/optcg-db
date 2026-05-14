@@ -35,6 +35,12 @@ type CardResult struct {
 	AltArts []string `json:"alt_arts"`
 }
 
+// TypeEntry is returned by /types: archetype name + how many unique cards carry it.
+type TypeEntry struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}
+
 var cards []Card
 
 var (
@@ -56,6 +62,7 @@ func main() {
 	mux.HandleFunc("GET /search", searchHandler)
 	mux.HandleFunc("GET /keywords", keywordsHandler)
 	mux.HandleFunc("GET /sets", setsHandler)
+	mux.HandleFunc("GET /types", typesHandler)
 	mux.HandleFunc("GET /image", imageProxyHandler)
 	mux.Handle("/", http.FileServer(http.Dir("static")))
 
@@ -91,10 +98,13 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	colorsParam := r.URL.Query().Get("colors")
 	typesParam := r.URL.Query().Get("types")
 	keyword := r.URL.Query().Get("keyword")
+	keywordExclude := r.URL.Query().Get("keyword_exclude")
 	setsParam := r.URL.Query().Get("sets")
 	seriesParam := r.URL.Query().Get("series")
+	tagsIncludeParam := r.URL.Query().Get("tags_include")
+	tagsExcludeParam := r.URL.Query().Get("tags_exclude")
 
-	if q == "" && colorsParam == "" && typesParam == "" && keyword == "" && setsParam == "" && seriesParam == "" {
+	if q == "" && colorsParam == "" && typesParam == "" && keyword == "" && keywordExclude == "" && setsParam == "" && seriesParam == "" && tagsIncludeParam == "" && tagsExcludeParam == "" {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode([]CardResult{})
 		return
@@ -144,6 +154,22 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	var filterTagsInclude map[string]bool
+	if tagsIncludeParam != "" {
+		filterTagsInclude = make(map[string]bool)
+		for _, t := range strings.Split(tagsIncludeParam, ",") {
+			filterTagsInclude[strings.TrimSpace(t)] = true
+		}
+	}
+
+	var filterTagsExclude map[string]bool
+	if tagsExcludeParam != "" {
+		filterTagsExclude = make(map[string]bool)
+		for _, t := range strings.Split(tagsExcludeParam, ",") {
+			filterTagsExclude[strings.TrimSpace(t)] = true
+		}
+	}
+
 	// Group by card_id as we filter — first occurrence wins for card data,
 	// subsequent occurrences are alt arts.
 	grouped := make(map[string]*CardResult)
@@ -173,8 +199,11 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			if filterTypes != nil && !filterTypes[card.CardType] {
 				continue
 			}
-			// Keyword is an exact substring match against plain text — no regex.
+			// Keyword filters are exact substring matches against plain text — no regex.
 			if keyword != "" && !strings.Contains(plain, keyword) && !strings.Contains(plainTrigger, keyword) {
+				continue
+			}
+			if keywordExclude != "" && (strings.Contains(plain, keywordExclude) || strings.Contains(plainTrigger, keywordExclude)) {
 				continue
 			}
 			if filterSets != nil && !filterSets[cardSet(card.CardID)] {
@@ -182,6 +211,30 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			if filterSeries != nil && !filterSeries[cardSeries(card.CardID)] {
 				continue
+			}
+			if filterTagsInclude != nil {
+				match := false
+				for _, t := range card.Types {
+					if filterTagsInclude[t] {
+						match = true
+						break
+					}
+				}
+				if !match {
+					continue
+				}
+			}
+			if filterTagsExclude != nil {
+				excluded := false
+				for _, t := range card.Types {
+					if filterTagsExclude[t] {
+						excluded = true
+						break
+					}
+				}
+				if excluded {
+					continue
+				}
 			}
 
 			grouped[card.CardID] = &CardResult{Card: card, AltArts: []string{}}
@@ -232,6 +285,35 @@ func keywordsHandler(w http.ResponseWriter, r *http.Request) {
 	sort.Strings(keywords)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(keywords)
+}
+
+func typesHandler(w http.ResponseWriter, r *http.Request) {
+	counts := make(map[string]int)
+	seenCard := make(map[string]bool)
+	for _, card := range cards {
+		if seenCard[card.CardID] {
+			continue
+		}
+		seenCard[card.CardID] = true
+		for _, t := range card.Types {
+			t = strings.TrimSpace(t)
+			if t != "" && t != "-" {
+				counts[t]++
+			}
+		}
+	}
+	result := make([]TypeEntry, 0, len(counts))
+	for name, count := range counts {
+		result = append(result, TypeEntry{Name: name, Count: count})
+	}
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].Count != result[j].Count {
+			return result[i].Count > result[j].Count
+		}
+		return result[i].Name < result[j].Name
+	})
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
 
 func imageProxyHandler(w http.ResponseWriter, r *http.Request) {

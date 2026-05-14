@@ -17,12 +17,13 @@ const EMPTY_STATE_MESSAGE = 'Use the search box, filters, or click a keyword on 
 
 // ── DOM references ───────────────────────────────────────────────────────────
 
-const searchInput    = document.getElementById('query');
-const keywordInput   = document.getElementById('keyword-filter');
-const setInput       = document.getElementById('set-filter');
-const statusBar      = document.getElementById('status');
+const searchInput      = document.getElementById('query');
+const keywordInput     = document.getElementById('keyword-filter');
+const keywordExcludeInput = document.getElementById('keyword-exclude');
+const setInput         = document.getElementById('set-filter');
+const statusBar        = document.getElementById('status');
 const resultsContainer = document.getElementById('results');
-const zoomImage      = document.getElementById('art-zoom');
+const zoomImage        = document.getElementById('art-zoom');
 
 // ── Hover zoom ───────────────────────────────────────────────────────────────
 
@@ -106,6 +107,11 @@ function setKeyword(kw) {
 
 function clearKeyword() {
   keywordInput.value = '';
+  doSearch();
+}
+
+function clearKeywordExclude() {
+  keywordExcludeInput.value = '';
   doSearch();
 }
 
@@ -239,14 +245,21 @@ function renderCard(card, searchRegex) {
 // ── Search ───────────────────────────────────────────────────────────────────
 
 function buildSearchParams() {
-  const q       = searchInput.value.trim();
-  const colors  = [...document.querySelectorAll('.color-btn.active')].map(b => b.dataset.color);
-  const types   = [...document.querySelectorAll('.type-btn.active')].map(b => b.dataset.type);
-  const keyword = keywordInput.value.trim();
-  const series  = activeSeries();
-  const set     = setInput.value.trim();
+  const q              = searchInput.value.trim();
+  const colors         = [...document.querySelectorAll('.color-btn.active')].map(b => b.dataset.color);
+  const types          = [...document.querySelectorAll('.type-btn.active')].map(b => b.dataset.type);
+  const keyword        = keywordInput.value.trim();
+  const keywordExclude = keywordExcludeInput.value.trim();
+  const series         = activeSeries();
+  const set            = setInput.value.trim();
+  const tagsInclude    = [];
+  const tagsExclude    = [];
+  tagStates.forEach((state, name) => {
+    if (state === 'include') tagsInclude.push(name);
+    else if (state === 'exclude') tagsExclude.push(name);
+  });
 
-  return { q, colors, types, keyword, series, set };
+  return { q, colors, types, keyword, keywordExclude, series, set, tagsInclude, tagsExclude };
 }
 
 function showEmptyState(message) {
@@ -254,9 +267,9 @@ function showEmptyState(message) {
 }
 
 async function doSearch() {
-  const { q, colors, types, keyword, series, set } = buildSearchParams();
+  const { q, colors, types, keyword, keywordExclude, series, set, tagsInclude, tagsExclude } = buildSearchParams();
 
-  if (!q && !colors.length && !types.length && !keyword && !series.length && !set) {
+  if (!q && !colors.length && !types.length && !keyword && !keywordExclude && !series.length && !set && !tagsInclude.length && !tagsExclude.length) {
     searchInput.classList.remove('error');
     statusBar.textContent = '';
     statusBar.className   = '';
@@ -265,12 +278,15 @@ async function doSearch() {
   }
 
   const params = new URLSearchParams();
-  if (q)             params.set('q',       q);
-  if (colors.length) params.set('colors',  colors.join(','));
-  if (types.length)  params.set('types',   types.join(','));
-  if (keyword)       params.set('keyword', keyword);
-  if (series.length) params.set('series',  series.join(','));
-  if (set)           params.set('sets',    set);
+  if (q)                params.set('q',               q);
+  if (colors.length)    params.set('colors',          colors.join(','));
+  if (types.length)     params.set('types',           types.join(','));
+  if (keyword)          params.set('keyword',         keyword);
+  if (keywordExclude)   params.set('keyword_exclude', keywordExclude);
+  if (series.length)    params.set('series',          series.join(','));
+  if (set)              params.set('sets',            set);
+  if (tagsInclude.length) params.set('tags_include',  tagsInclude.join(','));
+  if (tagsExclude.length) params.set('tags_exclude',  tagsExclude.join(','));
 
   let res, data;
   try {
@@ -309,6 +325,29 @@ async function doSearch() {
   resultsContainer.appendChild(frag);
 }
 
+// ── Tag (archetype) filter ───────────────────────────────────────────────────
+
+const tagStates = new Map(); // name → 'include' | 'exclude'
+
+function cycleTagState(name, btn) {
+  const current = tagStates.get(name) || '';
+  const next = current === '' ? 'include' : current === 'include' ? 'exclude' : '';
+  if (next) {
+    tagStates.set(name, next);
+    btn.className = `tag-btn ${next}`;
+  } else {
+    tagStates.delete(name);
+    btn.className = 'tag-btn';
+  }
+  doSearch();
+}
+
+function clearTags() {
+  tagStates.clear();
+  document.querySelectorAll('.tag-btn').forEach(btn => { btn.className = 'tag-btn'; });
+  doSearch();
+}
+
 // ── API loaders ──────────────────────────────────────────────────────────────
 
 function loadKeywords() {
@@ -318,6 +357,27 @@ function loadKeywords() {
       const opt = document.createElement('option');
       opt.value = kw;
       keywordDatalist.appendChild(opt);
+    });
+  });
+}
+
+function loadTypes() {
+  fetch('/types').then(r => r.json()).then(types => {
+    const tagList = document.getElementById('tag-list');
+    types.forEach(({ name, count }) => {
+      const btn = document.createElement('button');
+      btn.className = 'tag-btn';
+      btn.dataset.name = name;
+      btn.innerHTML = `${escapeHtml(name)}<span class="tag-count">${count}</span>`;
+      btn.addEventListener('click', () => cycleTagState(name, btn));
+      tagList.appendChild(btn);
+    });
+
+    document.getElementById('tag-search').addEventListener('input', () => {
+      const q = document.getElementById('tag-search').value.toLowerCase();
+      document.querySelectorAll('.tag-btn').forEach(btn => {
+        btn.style.display = btn.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+      });
     });
   });
 }
@@ -361,6 +421,7 @@ function init() {
 
   searchInput.addEventListener('input', scheduleSearch);
   keywordInput.addEventListener('input', scheduleSearch);
+  keywordExcludeInput.addEventListener('input', scheduleSearch);
   setInput.addEventListener('input', scheduleSearch);
 
   document.querySelectorAll('.filter-btn').forEach(btn =>
@@ -373,6 +434,7 @@ function init() {
 
   loadKeywords();
   loadSets();
+  loadTypes();
 }
 
 init();

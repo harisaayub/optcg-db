@@ -39,9 +39,14 @@
     <div class="filter-group">
       <span class="filter-label">Keyword</span>
       <div class="filter-input-wrap">
-        <input id="keyword-filter" class="filter-text-input" list="keyword-list" placeholder="[On Play], [Blocker]…" autocomplete="off">
+        <input id="keyword-filter" class="filter-text-input" list="keyword-list" placeholder="has [keyword]…" autocomplete="off">
         <datalist id="keyword-list"></datalist>
         <button class="clear-btn" title="Clear keyword" onclick="clearKeyword()">×</button>
+      </div>
+      <span class="filter-label">not</span>
+      <div class="filter-input-wrap">
+        <input id="keyword-exclude" class="filter-text-input" list="keyword-list" placeholder="no [keyword]…" autocomplete="off">
+        <button class="clear-btn" title="Clear excluded keyword" onclick="clearKeywordExclude()">×</button>
       </div>
     </div>
   </div>
@@ -62,6 +67,17 @@
         <button class="clear-btn" title="Clear set" onclick="clearSet()">×</button>
       </div>
     </div>
+  </div>
+
+  <div id="tag-filter-row">
+    <div class="filter-group">
+      <span class="filter-label">Tags</span>
+      <div class="filter-input-wrap">
+        <input id="tag-search" class="filter-text-input" placeholder="filter tags…" autocomplete="off">
+        <button class="clear-btn" title="Clear all tag filters" onclick="clearTags()">×</button>
+      </div>
+    </div>
+    <div id="tag-list" class="tag-list"></div>
   </div>
 
   <div class="examples">
