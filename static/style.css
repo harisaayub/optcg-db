@@ -366,15 +366,18 @@ main {
 /* ── Leader incompatibility highlight ──────────────────────────────────── */
 
 .card.leader-incompatible {
-  border-color: rgba(192, 57, 43, 0.5);
+  border-color: rgba(192, 57, 43, 0.6);
+  border-top: 5px solid rgba(192, 57, 43, 0.9);
   background: #130d14;
+  box-shadow: 0 -6px 16px rgba(192, 57, 43, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
-.card.leader-incompatible .card-img { opacity: 0.85; }
+.card.leader-incompatible .card-img { opacity: 0.82; }
 
 .card.leader-synergy {
-  border-color: rgba(39, 174, 96, 0.55);
+  border-color: rgba(39, 174, 96, 0.6);
+  border-top: 5px solid rgba(39, 174, 96, 0.9);
   background: #0b1a10;
-  box-shadow: 0 0 10px rgba(39, 174, 96, 0.18);
+  box-shadow: 0 -6px 16px rgba(39, 174, 96, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* ── Card layout ───────────────────────────────────────────────────────── */
