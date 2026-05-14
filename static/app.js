@@ -514,11 +514,16 @@ function loadSets() {
 
 function init() {
   const headerEl = document.querySelector('header');
+  let headerCollapsed = false;
   window.addEventListener('scroll', () => {
     const y = window.scrollY;
-    if (y > 120)     headerEl.classList.add('collapsed');
-    else if (y < 40) headerEl.classList.remove('collapsed');
-    // between 40–120: hold current state to avoid jitter
+    if (!headerCollapsed && y > 150) {
+      headerCollapsed = true;
+      headerEl.classList.add('collapsed');
+    } else if (headerCollapsed && y < 50) {
+      headerCollapsed = false;
+      headerEl.classList.remove('collapsed');
+    }
   }, { passive: true });
 
   let debounceTimer = null;
