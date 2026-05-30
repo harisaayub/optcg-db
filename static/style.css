@@ -85,8 +85,14 @@ h1 {
 
 /* ── Search bar ────────────────────────────────────────────────────────── */
 
+#search-bar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 #query {
-  width: 100%;
+  flex: 1;
   max-width: 620px;
   padding: 0.65rem 1.1rem;
   background: var(--bg-subtle);
@@ -103,6 +109,24 @@ h1 {
   box-shadow: 0 0 0 3px rgba(56, 178, 200, 0.12);
 }
 #query.error { border-color: var(--error); }
+
+#search-btn {
+  padding: 0.62rem 1.2rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #020d14;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.12s, box-shadow 0.12s;
+}
+#search-btn:hover {
+  opacity: 0.88;
+  box-shadow: 0 0 12px rgba(56, 178, 200, 0.35);
+}
 
 /* ── Collapsible filter panel ──────────────────────────────────────────── */
 

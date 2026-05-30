@@ -74,8 +74,6 @@ const CARD_COLOR_HEX = {
 
 const ZOOM_WIDTH_PX      = 280;
 const ZOOM_ASPECT_RATIO  = 585 / 421; // card image height:width
-const SEARCH_DEBOUNCE_MS = 300;
-
 const EMPTY_STATE_MESSAGE = 'Use the search box, filters, or click a keyword on any card to begin.';
 
 // ── DOM references ───────────────────────────────────────────────────────────
@@ -739,29 +737,35 @@ function buildLeaderDropdown(query) {
 function init() {
   const headerEl = document.querySelector('header');
   let headerCollapsed = false;
+  let lastScrollY = window.scrollY;
   window.addEventListener('scroll', () => {
     const y = window.scrollY;
     if (!headerCollapsed && y > 120) {
       headerCollapsed = true;
       headerEl.classList.add('collapsed');
-    } else if (headerCollapsed && y < 8) {
+    } else if (headerCollapsed && y <= 1 && y < lastScrollY) {
+      // Only re-open when actively scrolling upward to the very top,
+      // not from a layout shift caused by the collapse itself.
       headerCollapsed = false;
       headerEl.classList.remove('collapsed');
     }
+    lastScrollY = y;
   }, { passive: true });
 
-  let debounceTimer = null;
-  function scheduleSearch() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(doSearch, SEARCH_DEBOUNCE_MS);
-  }
+// Text inputs fire search only on Enter or the Search button, not on every keystroke.
+  const textInputs = [
+    searchInput,
+    document.getElementById('name-filter'),
+    document.getElementById('cost-min'),
+    document.getElementById('cost-max'),
+    document.getElementById('power-min'),
+    document.getElementById('power-max'),
+  ];
+  textInputs.forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  });
 
-  searchInput.addEventListener('input', scheduleSearch);
-  document.getElementById('name-filter').addEventListener('input', scheduleSearch);
-  document.getElementById('cost-min').addEventListener('input', scheduleSearch);
-  document.getElementById('cost-max').addEventListener('input', scheduleSearch);
-  document.getElementById('power-min').addEventListener('input', scheduleSearch);
-  document.getElementById('power-max').addEventListener('input', scheduleSearch);
+  document.getElementById('search-btn').addEventListener('click', doSearch);
 
   // Keyword chip inputs
   wireChipInput(document.getElementById('keyword-filter'), keywordFilter, 'include');
