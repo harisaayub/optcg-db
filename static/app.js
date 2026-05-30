@@ -706,15 +706,17 @@ function buildLeaderDropdown(query) {
 function init() {
   const headerEl = document.querySelector('header');
   let headerCollapsed = false;
+  let lastY = 0;
   window.addEventListener('scroll', () => {
     const y = window.scrollY;
-    if (!headerCollapsed && y > 150) {
+    if (!headerCollapsed && y > 120) {
       headerCollapsed = true;
       headerEl.classList.add('collapsed');
-    } else if (headerCollapsed && y < 50) {
+    } else if (headerCollapsed && y < 8) {
       headerCollapsed = false;
       headerEl.classList.remove('collapsed');
     }
+    lastY = y;
   }, { passive: true });
 
   let debounceTimer = null;
