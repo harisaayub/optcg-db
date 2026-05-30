@@ -33,9 +33,13 @@ type Card struct {
 }
 
 // CardResult is one entry per card_id with alt art URLs bundled in.
+// costVal and powerVal are pre-parsed at startup; unexported so they are not
+// included in JSON responses.
 type CardResult struct {
 	Card
-	AltArts []string `json:"alt_arts"`
+	AltArts  []string `json:"alt_arts"`
+	costVal  int      // -1 when non-numeric (leaders, events, stages)
+	powerVal int      // -1 when non-numeric
 }
 
 // SetEntry is returned by /api/sets.
@@ -67,7 +71,7 @@ type MetaResponse struct {
 
 // ── Global state ──────────────────────────────────────────────────────────────
 
-var cards []Card
+var allCards []CardResult
 
 // permittedCards holds card IDs that are legal in Standard Regulation even
 // though their set is otherwise rotated (sourced from the block-icon page).
@@ -174,10 +178,29 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := json.Unmarshal(data, &cards); err != nil {
+	var rawCards []Card
+	if err := json.Unmarshal(data, &rawCards); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Loaded %d cards", len(cards))
+	// Pre-group alt arts and pre-parse numeric fields so handlers never repeat this work.
+	idxByID := make(map[string]int, len(rawCards))
+	for _, raw := range rawCards {
+		if idx, seen := idxByID[raw.CardID]; seen {
+			allCards[idx].AltArts = append(allCards[idx].AltArts, raw.ImageURL)
+			continue
+		}
+		cv, err := strconv.Atoi(raw.Cost)
+		if err != nil {
+			cv = -1
+		}
+		pv, err := strconv.Atoi(raw.Power)
+		if err != nil {
+			pv = -1
+		}
+		idxByID[raw.CardID] = len(allCards)
+		allCards = append(allCards, CardResult{Card: raw, AltArts: []string{}, costVal: cv, powerVal: pv})
+	}
+	log.Printf("Loaded %d cards (%d unique)", len(rawCards), len(allCards))
 
 	permittedCards = make(map[string]bool)
 	if pb, err := os.ReadFile("permitted_cards.json"); err == nil {
@@ -317,82 +340,50 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	filterTagsInclude := splitParam(tagsIncludeParam)
 	filterTagsExclude := splitParam(tagsExcludeParam)
 
-	grouped := make(map[string]*CardResult)
-	order := make([]string, 0)
+	results := make([]CardResult, 0)
 
-	for _, card := range cards {
+	for _, card := range allCards {
 		plain := plainText(card.Text)
 		plainTrigger := plainText(card.Trigger)
 
-		if _, seen := grouped[card.CardID]; !seen {
-			if re != nil && !re.MatchString(plain) && !re.MatchString(plainTrigger) {
+		if re != nil && !re.MatchString(plain) && !re.MatchString(plainTrigger) {
+			continue
+		}
+		if nameRe != nil && !nameRe.MatchString(card.Name) {
+			continue
+		}
+		if costMin >= 0 || costMax >= 0 {
+			if card.costVal < 0 || (costMin >= 0 && card.costVal < costMin) || (costMax >= 0 && card.costVal > costMax) {
 				continue
 			}
-			if nameRe != nil && !nameRe.MatchString(card.Name) {
+		}
+		if powerMin >= 0 || powerMax >= 0 {
+			if card.powerVal < 0 || (powerMin >= 0 && card.powerVal < powerMin) || (powerMax >= 0 && card.powerVal > powerMax) {
 				continue
 			}
-			if costMin >= 0 || costMax >= 0 {
-				cv, err := strconv.Atoi(card.Cost)
-				if err != nil {
-					continue
-				}
-				if costMin >= 0 && cv < costMin {
-					continue
-				}
-				if costMax >= 0 && cv > costMax {
-					continue
-				}
-			}
-			if powerMin >= 0 || powerMax >= 0 {
-				pv, err := strconv.Atoi(card.Power)
-				if err != nil {
-					continue
-				}
-				if powerMin >= 0 && pv < powerMin {
-					continue
-				}
-				if powerMax >= 0 && pv > powerMax {
-					continue
-				}
-			}
-			if filterColors != nil && !anyMatch(card.Colors, filterColors) {
-				continue
-			}
-			if filterTypes != nil && !filterTypes[card.CardType] {
-				continue
-			}
-			if len(keywords) > 0 {
-				if keywordOR {
-					// OR: at least one keyword must appear
-					found := false
-					for _, kw := range keywords {
-						if strings.Contains(plain, kw) || strings.Contains(plainTrigger, kw) {
-							found = true
-							break
-						}
-					}
-					if !found {
-						continue
-					}
-				} else {
-					// AND: every keyword must appear
-					skip := false
-					for _, kw := range keywords {
-						if !strings.Contains(plain, kw) && !strings.Contains(plainTrigger, kw) {
-							skip = true
-							break
-						}
-					}
-					if skip {
-						continue
-					}
-				}
-			}
-			// Excludes: card must not contain any of these
-			{
-				skip := false
-				for _, kw := range keywordExcludes {
+		}
+		if filterColors != nil && !anyMatch(card.Colors, filterColors) {
+			continue
+		}
+		if filterTypes != nil && !filterTypes[card.CardType] {
+			continue
+		}
+		if len(keywords) > 0 {
+			if keywordOR {
+				found := false
+				for _, kw := range keywords {
 					if strings.Contains(plain, kw) || strings.Contains(plainTrigger, kw) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					continue
+				}
+			} else {
+				skip := false
+				for _, kw := range keywords {
+					if !strings.Contains(plain, kw) && !strings.Contains(plainTrigger, kw) {
 						skip = true
 						break
 					}
@@ -401,72 +392,73 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 					continue
 				}
 			}
-			if filterSets != nil && !filterSets[cardSet(card.CardID)] {
-				continue
+		}
+		skip := false
+		for _, kw := range keywordExcludes {
+			if strings.Contains(plain, kw) || strings.Contains(plainTrigger, kw) {
+				skip = true
+				break
 			}
-			if filterSetsExclude != nil && filterSetsExclude[cardSet(card.CardID)] {
-				continue
-			}
-			if filterSeries != nil && !filterSeries[cardSeries(card.CardID)] {
-				continue
-			}
-			if excludeRotated && isRotated(cardSet(card.CardID)) && !permittedCards[card.CardID] {
-				continue
-			}
-			if filterTagsInclude != nil && !anyMatch(card.Types, filterTagsInclude) {
-				continue
-			}
-			if filterTagsExclude != nil && anyMatch(card.Types, filterTagsExclude) {
-				continue
-			}
-			if len(costIncludeREs) > 0 || len(costExcludeREs) > 0 {
-				costText := extractEffectCosts(plain) + " " + extractEffectCosts(plainTrigger)
-				passed := true
-				if passed && len(costIncludeREs) > 0 {
-					if costOR {
-						found := false
-						for _, re := range costIncludeREs {
-							if re.MatchString(costText) {
-								found = true
-								break
-							}
-						}
-						if !found {
-							passed = false
-						}
-					} else {
-						for _, re := range costIncludeREs {
-							if !re.MatchString(costText) {
-								passed = false
-								break
-							}
+		}
+		if skip {
+			continue
+		}
+		if filterSets != nil && !filterSets[cardSet(card.CardID)] {
+			continue
+		}
+		if filterSetsExclude != nil && filterSetsExclude[cardSet(card.CardID)] {
+			continue
+		}
+		if filterSeries != nil && !filterSeries[cardSeries(card.CardID)] {
+			continue
+		}
+		if excludeRotated && isRotated(cardSet(card.CardID)) && !permittedCards[card.CardID] {
+			continue
+		}
+		if filterTagsInclude != nil && !anyMatch(card.Types, filterTagsInclude) {
+			continue
+		}
+		if filterTagsExclude != nil && anyMatch(card.Types, filterTagsExclude) {
+			continue
+		}
+		if len(costIncludeREs) > 0 || len(costExcludeREs) > 0 {
+			costText := extractEffectCosts(plain) + " " + extractEffectCosts(plainTrigger)
+			passed := true
+			if len(costIncludeREs) > 0 {
+				if costOR {
+					found := false
+					for _, re := range costIncludeREs {
+						if re.MatchString(costText) {
+							found = true
+							break
 						}
 					}
-				}
-				if passed {
-					for _, re := range costExcludeREs {
-						if re.MatchString(costText) {
+					passed = found
+				} else {
+					for _, re := range costIncludeREs {
+						if !re.MatchString(costText) {
 							passed = false
 							break
 						}
 					}
 				}
-				if !passed {
-					continue
+			}
+			if passed {
+				for _, re := range costExcludeREs {
+					if re.MatchString(costText) {
+						passed = false
+						break
+					}
 				}
 			}
-
-			grouped[card.CardID] = &CardResult{Card: card, AltArts: []string{}}
-			order = append(order, card.CardID)
-		} else {
-			grouped[card.CardID].AltArts = append(grouped[card.CardID].AltArts, card.ImageURL)
+			if !passed {
+				continue
+			}
 		}
+
+		results = append(results, card)
 	}
 
-	results := make([]CardResult, 0, len(order))
-	for _, id := range order {
-		results = append(results, *grouped[id])
-	}
 	writeJSON(w, results)
 }
 
@@ -525,22 +517,11 @@ func anyMatch(vals []string, allowed map[string]bool) bool {
 // leadersHandler returns every unique leader card with alt arts bundled,
 // sorted alphabetically by name then by card ID.
 func leadersHandler(w http.ResponseWriter, r *http.Request) {
-	grouped := make(map[string]*CardResult)
-	order := make([]string, 0)
-	for _, card := range cards {
-		if card.CardType != "LEADER" {
-			continue
+	results := make([]CardResult, 0)
+	for _, card := range allCards {
+		if card.CardType == "LEADER" {
+			results = append(results, card)
 		}
-		if _, seen := grouped[card.CardID]; !seen {
-			grouped[card.CardID] = &CardResult{Card: card, AltArts: []string{}}
-			order = append(order, card.CardID)
-		} else {
-			grouped[card.CardID].AltArts = append(grouped[card.CardID].AltArts, card.ImageURL)
-		}
-	}
-	results := make([]CardResult, 0, len(order))
-	for _, id := range order {
-		results = append(results, *grouped[id])
 	}
 	sort.Slice(results, func(i, j int) bool {
 		ni, nj := strings.ToLower(results[i].Name), strings.ToLower(results[j].Name)
@@ -557,22 +538,13 @@ func leadersHandler(w http.ResponseWriter, r *http.Request) {
 // cardHandler returns a single card by ID with alt arts bundled.
 func cardHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	var result *CardResult
-	for _, card := range cards {
-		if card.CardID != id {
-			continue
-		}
-		if result == nil {
-			result = &CardResult{Card: card, AltArts: []string{}}
-		} else {
-			result.AltArts = append(result.AltArts, card.ImageURL)
+	for _, card := range allCards {
+		if card.CardID == id {
+			writeJSON(w, card)
+			return
 		}
 	}
-	if result == nil {
-		http.NotFound(w, r)
-		return
-	}
-	writeJSON(w, result)
+	http.NotFound(w, r)
 }
 
 // ── Sets ──────────────────────────────────────────────────────────────────────
@@ -580,7 +552,7 @@ func cardHandler(w http.ResponseWriter, r *http.Request) {
 // setsHandler returns all known sets with their series and rotation status.
 func setsHandler(w http.ResponseWriter, r *http.Request) {
 	seen := make(map[string]bool)
-	for _, card := range cards {
+	for _, card := range allCards {
 		seen[cardSet(card.CardID)] = true
 	}
 	result := make([]SetEntry, 0, len(seen))
@@ -599,7 +571,7 @@ func setsHandler(w http.ResponseWriter, r *http.Request) {
 
 func keywordsHandler(w http.ResponseWriter, r *http.Request) {
 	seen := make(map[string]bool)
-	for _, card := range cards {
+	for _, card := range allCards {
 		for _, kw := range keywordRe.FindAllString(plainText(card.Text), -1) {
 			seen[kw] = true
 		}
@@ -619,12 +591,7 @@ func keywordsHandler(w http.ResponseWriter, r *http.Request) {
 
 func typesHandler(w http.ResponseWriter, r *http.Request) {
 	counts := make(map[string]int)
-	seenCard := make(map[string]bool)
-	for _, card := range cards {
-		if seenCard[card.CardID] {
-			continue
-		}
-		seenCard[card.CardID] = true
+	for _, card := range allCards {
 		for _, t := range card.Types {
 			t = strings.TrimSpace(t)
 			if t != "" && t != "-" {
@@ -651,7 +618,7 @@ func typesHandler(w http.ResponseWriter, r *http.Request) {
 func metaHandler(w http.ResponseWriter, r *http.Request) {
 	// Sets
 	seenSets := make(map[string]bool)
-	for _, card := range cards {
+	for _, card := range allCards {
 		seenSets[cardSet(card.CardID)] = true
 	}
 	sets := make([]SetEntry, 0, len(seenSets))
@@ -666,7 +633,7 @@ func metaHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Keywords
 	seenKW := make(map[string]bool)
-	for _, card := range cards {
+	for _, card := range allCards {
 		for _, kw := range keywordRe.FindAllString(plainText(card.Text), -1) {
 			seenKW[kw] = true
 		}
@@ -682,12 +649,7 @@ func metaHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Types
 	counts := make(map[string]int)
-	seenCard := make(map[string]bool)
-	for _, card := range cards {
-		if seenCard[card.CardID] {
-			continue
-		}
-		seenCard[card.CardID] = true
+	for _, card := range allCards {
 		for _, t := range card.Types {
 			t = strings.TrimSpace(t)
 			if t != "" && t != "-" {
@@ -717,12 +679,7 @@ func metaHandler(w http.ResponseWriter, r *http.Request) {
 // and "② Rest this Character" both become "Rest this Character".
 func computeCosts() []CostEntry {
 	counts := make(map[string]int)
-	seen := make(map[string]bool)
-	for _, card := range cards {
-		if seen[card.CardID] {
-			continue
-		}
-		seen[card.CardID] = true
+	for _, card := range allCards {
 		plain := plainText(card.Text)
 		stripped := keywordRe.ReplaceAllString(plain, "")
 		parts := strings.Split(stripped, ":")
