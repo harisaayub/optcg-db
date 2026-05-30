@@ -706,7 +706,6 @@ function buildLeaderDropdown(query) {
 function init() {
   const headerEl = document.querySelector('header');
   let headerCollapsed = false;
-  let lastY = 0;
   window.addEventListener('scroll', () => {
     const y = window.scrollY;
     if (!headerCollapsed && y > 120) {
@@ -716,7 +715,6 @@ function init() {
       headerCollapsed = false;
       headerEl.classList.remove('collapsed');
     }
-    lastY = y;
   }, { passive: true });
 
   let debounceTimer = null;
