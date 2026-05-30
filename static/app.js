@@ -1,3 +1,33 @@
+// ── API base URL ─────────────────────────────────────────────────────────────
+// Empty string → same-origin (local dev). Set to Railway URL for production.
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? ''
+  : 'https://YOUR_RAILWAY_URL.railway.app';
+
+// ── Grid zoom ────────────────────────────────────────────────────────────────
+
+const ZOOM_STEPS = [150, 200, 260, 310, 400, 510, 650];
+const ZOOM_DEFAULT_IDX = 3; // 310px
+
+let zoomIdx = parseInt(localStorage.getItem('cardZoomIdx') ?? ZOOM_DEFAULT_IDX, 10);
+if (zoomIdx < 0 || zoomIdx >= ZOOM_STEPS.length) zoomIdx = ZOOM_DEFAULT_IDX;
+
+function applyZoom() {
+  document.documentElement.style.setProperty('--card-min-width', ZOOM_STEPS[zoomIdx] + 'px');
+  document.getElementById('zoom-out').disabled = zoomIdx === 0;
+  document.getElementById('zoom-in').disabled  = zoomIdx === ZOOM_STEPS.length - 1;
+  localStorage.setItem('cardZoomIdx', zoomIdx);
+}
+
+document.getElementById('zoom-out').addEventListener('click', () => {
+  if (zoomIdx > 0) { zoomIdx--; applyZoom(); }
+});
+document.getElementById('zoom-in').addEventListener('click', () => {
+  if (zoomIdx < ZOOM_STEPS.length - 1) { zoomIdx++; applyZoom(); }
+});
+
+applyZoom();
+
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const CARD_COLOR_HEX = {
@@ -18,7 +48,6 @@ const EMPTY_STATE_MESSAGE = 'Use the search box, filters, or click a keyword on 
 // ── DOM references ───────────────────────────────────────────────────────────
 
 const searchInput      = document.getElementById('query');
-const setInput         = document.getElementById('set-filter');
 const statusBar        = document.getElementById('status');
 const resultsContainer = document.getElementById('results');
 const zoomImage        = document.getElementById('art-zoom');
@@ -96,23 +125,18 @@ function renderText(rawHtml, searchRegex) {
 
 function imageUrl(rawPath) {
   const path = (rawPath || '').replace('../', '/');
-  return `/image?path=${encodeURIComponent(path)}`;
+  return `${API_BASE}/image?path=${encodeURIComponent(path)}`;
 }
 
-// ── Keyword filter ───────────────────────────────────────────────────────────
+// ── Keyword / name filter helpers ────────────────────────────────────────────
 
 function setKeyword(kw) {
   keywordInput.value = kw;
   doSearch();
 }
 
-function clearKeyword() {
-  keywordInput.value = '';
-  doSearch();
-}
-
-function clearKeywordExclude() {
-  keywordExcludeInput.value = '';
+function clearNameFilter() {
+  document.getElementById('name-filter').value = '';
   doSearch();
 }
 
@@ -123,25 +147,6 @@ let allSets = []; // SetEntry objects: { code, series, rotated }
 function activeSeries() {
   return [...document.querySelectorAll('#series-btns .filter-btn.active')]
     .map(b => b.dataset.series);
-}
-
-function updateSetDatalist() {
-  const active = activeSeries();
-  const setDatalist = document.getElementById('set-list');
-  setDatalist.innerHTML = '';
-  const visible = active.length
-    ? allSets.filter(s => active.includes(s.series))
-    : allSets;
-  visible.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.code;
-    setDatalist.appendChild(opt);
-  });
-}
-
-function clearSet() {
-  setInput.value = '';
-  doSearch();
 }
 
 // ── Card render helpers ──────────────────────────────────────────────────────
@@ -248,19 +253,23 @@ function renderCard(card, searchRegex) {
 
 function buildSearchParams() {
   const q              = searchInput.value.trim();
+  const name           = document.getElementById('name-filter').value.trim();
   const colors         = [...document.querySelectorAll('.color-btn.active')].map(b => b.dataset.color);
   const types          = [...document.querySelectorAll('.type-btn.active')].map(b => b.dataset.type);
   const series         = activeSeries();
-  const set            = setInput.value.trim();
   const excludeRotated = document.getElementById('exclude-rotated-btn').classList.contains('active');
+  const costMin        = document.getElementById('cost-min').value.trim();
+  const costMax        = document.getElementById('cost-max').value.trim();
+  const powerMin       = document.getElementById('power-min').value.trim();
+  const powerMax       = document.getElementById('power-max').value.trim();
   const tagsInclude    = [];
   const tagsExclude    = [];
-  tagStates.forEach((state, name) => {
-    if (state === 'include') tagsInclude.push(name);
-    else if (state === 'exclude') tagsExclude.push(name);
+  tagStates.forEach((state, tag) => {
+    if (state === 'include') tagsInclude.push(tag);
+    else if (state === 'exclude') tagsExclude.push(tag);
   });
 
-  return { q, colors, types, series, set, excludeRotated, tagsInclude, tagsExclude };
+  return { q, name, colors, types, series, excludeRotated, costMin, costMax, powerMin, powerMax, tagsInclude, tagsExclude };
 }
 
 function showEmptyState(message) {
@@ -268,10 +277,11 @@ function showEmptyState(message) {
 }
 
 async function doSearch() {
-  const { q, colors, types, series, set, excludeRotated, tagsInclude, tagsExclude } = buildSearchParams();
+  const { q, name, colors, types, series, excludeRotated, costMin, costMax, powerMin, powerMax, tagsInclude, tagsExclude } = buildSearchParams();
 
-  if (!q && !colors.length && !types.length && keywordFilter.isEmpty() && costFilter.isEmpty()
-      && !series.length && !set && !excludeRotated && !tagsInclude.length && !tagsExclude.length) {
+  if (!q && !name && !colors.length && !types.length && keywordFilter.isEmpty() && costFilter.isEmpty()
+      && !series.length && setFilter.isEmpty() && !excludeRotated && !costMin && !costMax
+      && !powerMin && !powerMax && !tagsInclude.length && !tagsExclude.length) {
     searchInput.classList.remove('error');
     statusBar.textContent = '';
     statusBar.className   = '';
@@ -280,20 +290,25 @@ async function doSearch() {
   }
 
   const params = new URLSearchParams();
-  if (q)              params.set('q',      q);
-  if (colors.length)  params.set('colors', colors.join(','));
-  if (types.length)   params.set('types',  types.join(','));
+  if (q)              params.set('q',         q);
+  if (name)           params.set('name',      name);
+  if (colors.length)  params.set('colors',    colors.join(','));
+  if (types.length)   params.set('types',     types.join(','));
+  if (costMin)        params.set('cost_min',  costMin);
+  if (costMax)        params.set('cost_max',  costMax);
+  if (powerMin)       params.set('power_min', powerMin);
+  if (powerMax)       params.set('power_max', powerMax);
   keywordFilter.buildParams(params);
   costFilter.buildParams(params);
+  setFilter.buildParams(params);
   if (series.length)  params.set('series', series.join(','));
-  if (set)            params.set('sets',   set);
   if (excludeRotated)           params.set('exclude_rotated', '1');
   if (tagsInclude.length)       params.set('tags_include',    tagsInclude.join(','));
   if (tagsExclude.length)       params.set('tags_exclude',    tagsExclude.join(','));
 
   let res, data;
   try {
-    res  = await fetch(`/api/search?${params}`);
+    res  = await fetch(`${API_BASE}/api/search?${params}`);
     data = await res.json();
   } catch {
     statusBar.textContent = 'Network error';
@@ -486,6 +501,7 @@ class ChipFilter {
 
 const keywordFilter = new ChipFilter('keyword', 'keyword');
 const costFilter    = new ChipFilter('cost', 'cost');
+const setFilter     = new ChipFilter('set', 'sets');
 
 // ── Shared chip dropdown ──────────────────────────────────────────────────────
 
@@ -585,13 +601,14 @@ function wireModeBtn(btnEl, filter) {
 
 // loadMeta fetches /api/meta once to populate sets, keywords, and types.
 function loadMeta() {
-  fetch('/api/meta').then(r => r.json()).then(({ sets, keywords, types, costs }) => {
+  fetch(`${API_BASE}/api/meta`).then(r => r.json()).then(({ sets, keywords, types, costs }) => {
     // Keywords and costs — populate chip filter dropdowns
     keywordFilter.setItems(keywords);
     costFilter.setItems(costs);
 
-    // Sets — store as SetEntry objects, build series buttons
+    // Sets — store as SetEntry objects, populate set chip filter, build series buttons
     allSets = sets;
+    setFilter.setItems(sets.map(s => s.code));
     const seriesList = [...new Set(sets.map(s => s.series))].sort();
     const seriesBtns = document.getElementById('series-btns');
     seriesList.forEach(sr => {
@@ -601,18 +618,10 @@ function loadMeta() {
       btn.textContent    = sr;
       btn.addEventListener('click', () => {
         btn.classList.toggle('active');
-        updateSetDatalist();
-        const setVal = setInput.value.trim();
-        const active = activeSeries();
-        const currentSet = allSets.find(s => s.code === setVal);
-        if (currentSet && active.length && !active.includes(currentSet.series)) {
-          setInput.value = '';
-        }
         doSearch();
       });
       seriesBtns.appendChild(btn);
     });
-    updateSetDatalist();
 
     // Types (archetype tag buttons)
     const tagList = document.getElementById('tag-list');
@@ -634,7 +643,7 @@ function loadMeta() {
 }
 
 function loadLeaders() {
-  fetch('/api/leaders')
+  fetch(`${API_BASE}/api/leaders`)
     .then(r => r.json())
     .then(leaders => { allLeaders = leaders; });
 }
@@ -715,7 +724,11 @@ function init() {
   }
 
   searchInput.addEventListener('input', scheduleSearch);
-  setInput.addEventListener('input', scheduleSearch);
+  document.getElementById('name-filter').addEventListener('input', scheduleSearch);
+  document.getElementById('cost-min').addEventListener('input', scheduleSearch);
+  document.getElementById('cost-max').addEventListener('input', scheduleSearch);
+  document.getElementById('power-min').addEventListener('input', scheduleSearch);
+  document.getElementById('power-max').addEventListener('input', scheduleSearch);
 
   // Keyword chip inputs
   wireChipInput(document.getElementById('keyword-filter'), keywordFilter, 'include');
@@ -726,6 +739,10 @@ function init() {
   wireChipInput(document.getElementById('cost-filter'), costFilter, 'include');
   wireChipInput(document.getElementById('cost-exclude'), costFilter, 'exclude');
   wireModeBtn(document.getElementById('cost-mode-btn'), costFilter);
+
+  // Set chip inputs
+  wireChipInput(document.getElementById('set-filter'), setFilter, 'include');
+  wireChipInput(document.getElementById('set-exclude'), setFilter, 'exclude');
 
   // Shared chip dropdown repositioning
   const chipDropdown = document.getElementById('chip-dropdown');

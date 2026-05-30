@@ -14,9 +14,11 @@
   <input id="query" type="text" placeholder="regex on effect text — e.g. draw \d+ card" autocomplete="off" spellcheck="false">
 
   <div id="filter-panel">
+
+    <!-- Row 1: Card identity — toggle buttons only -->
     <div class="filters">
       <div class="filter-group">
-        <span class="filter-label">Color</span>
+        <span class="filter-label" data-tooltip="Show cards matching any selected color">Color</span>
         <button class="filter-btn color-btn" data-color="Red">Red</button>
         <button class="filter-btn color-btn" data-color="Green">Green</button>
         <button class="filter-btn color-btn" data-color="Blue">Blue</button>
@@ -24,38 +26,58 @@
         <button class="filter-btn color-btn" data-color="Black">Black</button>
         <button class="filter-btn color-btn" data-color="Yellow">Yellow</button>
       </div>
-
       <div class="filter-sep"></div>
-
       <div class="filter-group">
-        <span class="filter-label">Type</span>
+        <span class="filter-label" data-tooltip="Filter by card type: Leader, Character, Event, or Stage">Type</span>
         <button class="filter-btn type-btn" data-type="LEADER">Leader</button>
         <button class="filter-btn type-btn" data-type="CHARACTER">Character</button>
         <button class="filter-btn type-btn" data-type="EVENT">Event</button>
         <button class="filter-btn type-btn" data-type="STAGE">Stage</button>
       </div>
-
       <div class="filter-sep"></div>
-
       <div class="filter-group">
-        <button id="exclude-rotated-btn" class="filter-btn">Exclude Rotated</button>
+        <button id="exclude-rotated-btn" class="filter-btn" data-tooltip="Hide cards from rotated sets (OP01–OP04, ST01–ST09) except block-icon exceptions">Exclude Rotated</button>
       </div>
-
-      <div class="filter-sep"></div>
-
+      <div class="filter-spacer"></div>
       <div class="filter-group">
-        <span class="filter-label">Leader</span>
-        <div class="filter-input-wrap leader-picker">
-          <input id="leader-input" class="filter-text-input" placeholder="e.g. Sanji, Luffy…" autocomplete="off" spellcheck="false">
-          <button class="clear-btn" title="Clear leader" onclick="clearLeader()">×</button>
+        <span class="filter-label" data-tooltip="Adjust how many cards appear per row">Zoom</span>
+        <div class="zoom-controls">
+          <button class="zoom-btn" id="zoom-out" title="Smaller cards (more per row)">−</button>
+          <button class="zoom-btn" id="zoom-in"  title="Larger cards (fewer per row)">+</button>
         </div>
       </div>
+    </div>
 
-      <div class="filter-sep"></div>
-
+    <!-- Row 2: Numeric stats + name — text/number inputs -->
+    <div class="filters">
       <div class="filter-group">
-        <span class="filter-label">Keyword</span>
-        <button id="keyword-mode-btn" class="filter-btn keyword-mode-btn" title="Toggle AND / OR logic for keyword includes">ALL</button>
+        <span class="filter-label" data-tooltip="Card cost (top-left number). Leave either end blank for an open range.">Cost</span>
+        <input id="cost-min" class="filter-text-input range-input" type="number" min="0" max="10" placeholder="min">
+        <span class="filter-label">–</span>
+        <input id="cost-max" class="filter-text-input range-input" type="number" min="0" max="10" placeholder="max">
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <span class="filter-label" data-tooltip="Card power value. Leave either end blank for an open range.">Power</span>
+        <input id="power-min" class="filter-text-input range-input" type="number" min="0" step="1000" placeholder="min">
+        <span class="filter-label">–</span>
+        <input id="power-max" class="filter-text-input range-input" type="number" min="0" step="1000" placeholder="max">
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group filter-group--grow">
+        <span class="filter-label" data-tooltip="Regex match on card name. e.g. ^Nami$ for exact, Luffy for partial.">Name</span>
+        <div class="filter-input-wrap filter-input-wrap--grow">
+          <input id="name-filter" class="filter-text-input" placeholder="regex…" autocomplete="off" spellcheck="false">
+          <button class="clear-btn" title="Clear" onclick="clearNameFilter()">×</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Effect text — chip filters -->
+    <div class="filters">
+      <div class="filter-group filter-group--grow">
+        <span class="filter-label" data-tooltip="Filter by effect keywords like [On Play] or [Blocker]. ALL = card must have every selected keyword; ANY = at least one.">Keyword</span>
+        <button id="keyword-mode-btn" class="filter-btn keyword-mode-btn" title="Toggle AND / OR logic">ALL</button>
         <div class="chip-input-wrap" id="keyword-include-wrap">
           <input id="keyword-filter" class="chip-text-input" placeholder="add keyword…" autocomplete="off" spellcheck="false" readonly>
         </div>
@@ -64,12 +86,10 @@
           <input id="keyword-exclude" class="chip-text-input" placeholder="add keyword…" autocomplete="off" spellcheck="false" readonly>
         </div>
       </div>
-
       <div class="filter-sep"></div>
-
-      <div class="filter-group">
-        <span class="filter-label">Effect cost</span>
-        <button id="cost-mode-btn" class="filter-btn keyword-mode-btn" title="Toggle AND / OR logic for cost includes">ALL</button>
+      <div class="filter-group filter-group--grow">
+        <span class="filter-label" data-tooltip="Filter by the activation cost of effects (e.g. 'Rest this Character'). Supports regex patterns.">Effect cost</span>
+        <button id="cost-mode-btn" class="filter-btn keyword-mode-btn" title="Toggle AND / OR logic">ALL</button>
         <div class="chip-input-wrap" id="cost-include-wrap">
           <input id="cost-filter" class="chip-text-input" placeholder="pick or type regex…" autocomplete="off" spellcheck="false" readonly>
         </div>
@@ -80,27 +100,40 @@
       </div>
     </div>
 
-    <div class="filters" id="set-filters">
+    <!-- Row 4: Card origin — series toggles + set chips -->
+    <div class="filters">
       <div class="filter-group">
-        <span class="filter-label">Series</span>
+        <span class="filter-label" data-tooltip="Filter to all cards from an entire series (OP, ST, EB, etc.)">Series</span>
         <div id="series-btns"></div>
       </div>
-
       <div class="filter-sep"></div>
-
-      <div class="filter-group">
-        <span class="filter-label">Set</span>
-        <div class="filter-input-wrap">
-          <input id="set-filter" class="filter-text-input" list="set-list" placeholder="OP01, ST15…" autocomplete="off">
-          <datalist id="set-list"></datalist>
-          <button class="clear-btn" title="Clear set" onclick="clearSet()">×</button>
+      <div class="filter-group filter-group--grow">
+        <span class="filter-label" data-tooltip="Include or exclude specific sets. Type to search, click to add. 'not' chips exclude that set.">Set</span>
+        <div class="chip-input-wrap" id="set-include-wrap">
+          <input id="set-filter" class="chip-text-input" placeholder="add set…" autocomplete="off" spellcheck="false" readonly>
+        </div>
+        <span class="filter-label">not</span>
+        <div class="chip-input-wrap" id="set-exclude-wrap">
+          <input id="set-exclude" class="chip-text-input" placeholder="add set…" autocomplete="off" spellcheck="false" readonly>
         </div>
       </div>
     </div>
 
+    <!-- Row 5: Leader compatibility -->
+    <div class="filters">
+      <div class="filter-group filter-group--grow">
+        <span class="filter-label" data-tooltip="Select a leader to highlight synergistic cards (green border) and incompatible ones (red border). Also pre-fills the color filter.">Leader</span>
+        <div class="filter-input-wrap filter-input-wrap--grow leader-picker">
+          <input id="leader-input" class="filter-text-input" placeholder="e.g. Sanji, Luffy…" autocomplete="off" spellcheck="false">
+          <button class="clear-btn" title="Clear leader" onclick="clearLeader()">×</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 6: Archetypes -->
     <div id="tag-filter-row">
       <div class="filter-group">
-        <span class="filter-label">Tags</span>
+        <span class="filter-label" data-tooltip="Filter by archetype tags. Click once to include (green), again to exclude (red strikethrough), again to clear.">Tags</span>
         <div class="filter-input-wrap">
           <input id="tag-search" class="filter-text-input" placeholder="filter tags…" autocomplete="off">
           <button class="clear-btn" title="Clear all tag filters" onclick="clearTags()">×</button>
@@ -109,6 +142,7 @@
       <div id="tag-list" class="tag-list"></div>
     </div>
 
+    <!-- Row 7: Quick searches -->
     <div class="examples">
       <span>Try:</span>
       <span class="example-chip" data-q="draw \d+ card">draw N cards</span>
@@ -120,6 +154,7 @@
       <span class="example-chip" data-q="opponent's Leader">vs Leader</span>
       <span class="example-chip" data-q="end of (your|this) turn">end of turn</span>
       <span class="example-chip" data-q="from the top of your deck">top of deck</span>
+      <span class="example-chip" data-q="place them at the top.* (or bottom|).* in any order">scry</span>
     </div>
 
     <div id="status"></div>

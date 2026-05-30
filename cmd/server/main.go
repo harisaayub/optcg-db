@@ -69,6 +69,10 @@ type MetaResponse struct {
 
 var cards []Card
 
+// permittedCards holds card IDs that are legal in Standard Regulation even
+// though their set is otherwise rotated (sourced from the block-icon page).
+var permittedCards map[string]bool
+
 var (
 	htmlTagRe = regexp.MustCompile(`<[^>]+>`)
 	keywordRe = regexp.MustCompile(`\[[^\]]+\]`)
@@ -175,6 +179,19 @@ func main() {
 	}
 	log.Printf("Loaded %d cards", len(cards))
 
+	permittedCards = make(map[string]bool)
+	if pb, err := os.ReadFile("permitted_cards.json"); err == nil {
+		var ids []string
+		if err := json.Unmarshal(pb, &ids); err == nil {
+			for _, id := range ids {
+				permittedCards[id] = true
+			}
+			log.Printf("Loaded %d permitted cards", len(ids))
+		}
+	} else {
+		log.Println("permitted_cards.json not found; rotation exceptions disabled")
+	}
+
 	mux := http.NewServeMux()
 
 	// API routes — all CORS-enabled, all under /api/
@@ -189,12 +206,15 @@ func main() {
 	// OPTIONS preflight catch-all for the /api/ subtree
 	mux.HandleFunc("OPTIONS /api/", withCORS(func(w http.ResponseWriter, r *http.Request) {}))
 
-	// Image proxy and static frontend — not versioned API
-	mux.HandleFunc("GET /image", imageProxyHandler)
-	mux.Handle("/", http.FileServer(http.Dir("static")))
+	// Image proxy
+	mux.HandleFunc("GET /image", withCORS(imageProxyHandler))
 
-	log.Println("Listening on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8090"
+	}
+	log.Printf("Listening on :%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
 // ── Search ────────────────────────────────────────────────────────────────────
@@ -209,15 +229,23 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	costParam := r.URL.Query().Get("cost")
 	costMode := r.URL.Query().Get("cost_mode")
 	costExclude := r.URL.Query().Get("cost_exclude")
-	setsParam := r.URL.Query().Get("sets")
-	seriesParam := r.URL.Query().Get("series")
+	setsParam        := r.URL.Query().Get("sets")
+	setsExcludeParam := r.URL.Query().Get("sets_exclude")
+	seriesParam      := r.URL.Query().Get("series")
 	tagsIncludeParam := r.URL.Query().Get("tags_include")
 	tagsExcludeParam := r.URL.Query().Get("tags_exclude")
-	excludeRotated := r.URL.Query().Get("exclude_rotated") == "1"
+	excludeRotated   := r.URL.Query().Get("exclude_rotated") == "1"
+	nameParam        := r.URL.Query().Get("name")
+	costMinParam     := r.URL.Query().Get("cost_min")
+	costMaxParam     := r.URL.Query().Get("cost_max")
+	powerMinParam    := r.URL.Query().Get("power_min")
+	powerMaxParam    := r.URL.Query().Get("power_max")
 
 	if q == "" && colorsParam == "" && typesParam == "" && keywordParam == "" &&
 		keywordExclude == "" && costParam == "" && costExclude == "" && setsParam == "" &&
-		seriesParam == "" && tagsIncludeParam == "" && tagsExcludeParam == "" && !excludeRotated {
+		setsExcludeParam == "" && seriesParam == "" && tagsIncludeParam == "" &&
+		tagsExcludeParam == "" && !excludeRotated && nameParam == "" &&
+		costMinParam == "" && costMaxParam == "" && powerMinParam == "" && powerMaxParam == "" {
 		writeJSON(w, []CardResult{})
 		return
 	}
@@ -229,6 +257,40 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			writeError(w, http.StatusBadRequest, "invalid regex: "+err.Error())
 			return
+		}
+	}
+
+	var nameRe *regexp.Regexp
+	if nameParam != "" {
+		var err error
+		nameRe, err = regexp.Compile("(?i)" + nameParam)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, "invalid name regex: "+err.Error())
+			return
+		}
+	}
+
+	costMin, costMax := -1, -1
+	if costMinParam != "" {
+		if v, err := strconv.Atoi(costMinParam); err == nil {
+			costMin = v
+		}
+	}
+	if costMaxParam != "" {
+		if v, err := strconv.Atoi(costMaxParam); err == nil {
+			costMax = v
+		}
+	}
+
+	powerMin, powerMax := -1, -1
+	if powerMinParam != "" {
+		if v, err := strconv.Atoi(powerMinParam); err == nil {
+			powerMin = v
+		}
+	}
+	if powerMaxParam != "" {
+		if v, err := strconv.Atoi(powerMaxParam); err == nil {
+			powerMax = v
 		}
 	}
 
@@ -249,8 +311,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	filterColors := splitParam(colorsParam)
 	filterTypes := splitParam(typesParam)
-	filterSets := splitParam(setsParam)
-	filterSeries := splitParam(seriesParam)
+	filterSets        := splitParam(setsParam)
+	filterSetsExclude := splitParam(setsExcludeParam)
+	filterSeries      := splitParam(seriesParam)
 	filterTagsInclude := splitParam(tagsIncludeParam)
 	filterTagsExclude := splitParam(tagsExcludeParam)
 
@@ -264,6 +327,33 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		if _, seen := grouped[card.CardID]; !seen {
 			if re != nil && !re.MatchString(plain) && !re.MatchString(plainTrigger) {
 				continue
+			}
+			if nameRe != nil && !nameRe.MatchString(card.Name) {
+				continue
+			}
+			if costMin >= 0 || costMax >= 0 {
+				cv, err := strconv.Atoi(card.Cost)
+				if err != nil {
+					continue
+				}
+				if costMin >= 0 && cv < costMin {
+					continue
+				}
+				if costMax >= 0 && cv > costMax {
+					continue
+				}
+			}
+			if powerMin >= 0 || powerMax >= 0 {
+				pv, err := strconv.Atoi(card.Power)
+				if err != nil {
+					continue
+				}
+				if powerMin >= 0 && pv < powerMin {
+					continue
+				}
+				if powerMax >= 0 && pv > powerMax {
+					continue
+				}
 			}
 			if filterColors != nil && !anyMatch(card.Colors, filterColors) {
 				continue
@@ -314,10 +404,13 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			if filterSets != nil && !filterSets[cardSet(card.CardID)] {
 				continue
 			}
+			if filterSetsExclude != nil && filterSetsExclude[cardSet(card.CardID)] {
+				continue
+			}
 			if filterSeries != nil && !filterSeries[cardSeries(card.CardID)] {
 				continue
 			}
-			if excludeRotated && isRotated(cardSet(card.CardID)) {
+			if excludeRotated && isRotated(cardSet(card.CardID)) && !permittedCards[card.CardID] {
 				continue
 			}
 			if filterTagsInclude != nil && !anyMatch(card.Types, filterTagsInclude) {
@@ -429,7 +522,8 @@ func anyMatch(vals []string, allowed map[string]bool) bool {
 
 // ── Leaders ───────────────────────────────────────────────────────────────────
 
-// leadersHandler returns every unique leader card with alt arts bundled.
+// leadersHandler returns every unique leader card with alt arts bundled,
+// sorted alphabetically by name then by card ID.
 func leadersHandler(w http.ResponseWriter, r *http.Request) {
 	grouped := make(map[string]*CardResult)
 	order := make([]string, 0)
@@ -448,6 +542,13 @@ func leadersHandler(w http.ResponseWriter, r *http.Request) {
 	for _, id := range order {
 		results = append(results, *grouped[id])
 	}
+	sort.Slice(results, func(i, j int) bool {
+		ni, nj := strings.ToLower(results[i].Name), strings.ToLower(results[j].Name)
+		if ni != nj {
+			return ni < nj
+		}
+		return results[i].CardID < results[j].CardID
+	})
 	writeJSON(w, results)
 }
 
