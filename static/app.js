@@ -4,6 +4,39 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
   ? ''
   : 'https://optcg-db-production.up.railway.app';
 
+// ── Tooltips ─────────────────────────────────────────────────────────────────
+
+const tooltipEl = document.createElement('div');
+tooltipEl.id = 'tooltip';
+document.body.appendChild(tooltipEl);
+
+document.querySelectorAll('[data-tooltip]').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    tooltipEl.textContent = el.dataset.tooltip;
+    tooltipEl.classList.add('visible');
+
+    const r  = el.getBoundingClientRect();
+    const tw = tooltipEl.offsetWidth;
+    const th = tooltipEl.offsetHeight;
+    const pad = 8;
+
+    // Default: below the element, left-aligned to it
+    let top  = r.bottom + 6;
+    let left = r.left;
+
+    // Flip above if it would fall below the viewport
+    if (top + th + pad > window.innerHeight) top = r.top - th - 6;
+
+    // Clamp horizontally within viewport
+    if (left + tw + pad > window.innerWidth) left = window.innerWidth - tw - pad;
+    if (left < pad) left = pad;
+
+    tooltipEl.style.left = left + 'px';
+    tooltipEl.style.top  = top  + 'px';
+  });
+  el.addEventListener('mouseleave', () => tooltipEl.classList.remove('visible'));
+});
+
 // ── Grid zoom ────────────────────────────────────────────────────────────────
 
 const ZOOM_STEPS = [150, 200, 260, 310, 400, 510, 650];

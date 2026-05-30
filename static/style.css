@@ -176,38 +176,30 @@ header.collapsed #filter-panel {
   flex-shrink: 0;
 }
 
-/* ── Tooltips ───────────────────────────────────────────────────────────── */
+/* ── Tooltips (JS-positioned, see app.js) ───────────────────────────────── */
 
-[data-tooltip] {
-  position: relative;
-  cursor: help;
-}
-[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  top: calc(100% + 7px);
-  left: 50%;
-  transform: translateX(-50%);
+[data-tooltip] { cursor: help; }
+
+#tooltip {
+  position: fixed;
+  z-index: 2000;
   background: #060e18;
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   line-height: 1.5;
-  padding: 0.4rem 0.65rem;
+  padding: 0.38rem 0.65rem;
   border-radius: 6px;
-  white-space: normal;
-  width: max-content;
   max-width: 240px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s;
-  z-index: 500;
+  transition: opacity 0.12s;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
   text-transform: none;
   letter-spacing: 0;
   font-weight: 400;
 }
-[data-tooltip]:hover::after { opacity: 1; }
+#tooltip.visible { opacity: 1; }
 
 .filter-sep {
   width: 1px;
@@ -869,3 +861,70 @@ mark {
   transition: opacity 0.12s ease;
 }
 #art-zoom.visible { display: block; opacity: 1; }
+
+/* ── Mobile layout ──────────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  header {
+    padding: 0.65rem 0.9rem;
+  }
+
+  #filter-panel { max-height: 1400px; }
+
+  /* Allow rows to wrap on small screens */
+  .filters {
+    flex-wrap: wrap;
+    gap: 0.4rem 0.5rem;
+  }
+
+  /* Vertical separators don't make sense in a wrapping layout */
+  .filter-sep { display: none; }
+
+  /* Spacer only works in a single-line row */
+  .filter-spacer { display: none; }
+
+  /* Growing groups go full-width so they don't compete for space */
+  .filter-group--grow {
+    flex-basis: 100%;
+  }
+
+  /* Keyword / effect-cost chip groups each get their own line */
+  .filter-group--grow .chip-input-wrap {
+    min-width: 80px;
+  }
+
+  /* Row 3 (keyword + effect cost): stack vertically */
+  .filters:has(#keyword-include-wrap) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filters:has(#keyword-include-wrap) .filter-group--grow {
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  /* Zoom lands at the end of the identity row naturally after flex-wrap */
+  .zoom-controls { margin-left: auto; }
+
+  /* Name input stretches full width */
+  .filter-input-wrap--grow { width: 100%; }
+
+  /* Range inputs a touch wider for fat fingers */
+  .range-input { width: 64px; }
+
+  /* Leader input full width */
+  #leader-input { width: 100%; }
+
+  /* Tag list shorter on mobile */
+  .tag-list { max-height: 64px; }
+
+  /* Cards: single column on very small screens */
+  main { padding: 0.75rem; }
+}
+
+@media (max-width: 420px) {
+  h1 { font-size: 1.3rem; }
+  #query { font-size: 0.9rem; }
+  .color-btn, .type-btn { padding: 0.28rem 0.6rem; font-size: 0.75rem; }
+  .filter-btn { font-size: 0.74rem; padding: 0.26rem 0.6rem; }
+}
