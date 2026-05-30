@@ -2,7 +2,7 @@
 // Empty string → same-origin (local dev). Set to Railway URL for production.
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? ''
-  : 'https://YOUR_RAILWAY_URL.railway.app';
+  : 'https://optcg-db-production.up.railway.app';
 
 // ── Grid zoom ────────────────────────────────────────────────────────────────
 
