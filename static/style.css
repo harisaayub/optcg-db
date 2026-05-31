@@ -72,6 +72,41 @@ header {
   gap: 0.65rem;
 }
 
+/* Slim expand-hint bar — hidden when expanded, shown when collapsed */
+#collapse-bar {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: height 0.22s ease, opacity 0.18s ease;
+  cursor: default;
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+#collapse-bar::after {
+  content: '▼';
+  font-size: 0.6rem;
+  opacity: 0.5;
+}
+
+header.collapsed {
+  padding: 0 1.5rem;
+  gap: 0;
+}
+header.collapsed #collapse-bar {
+  display: flex;
+  height: 22px;
+  opacity: 1;
+}
+header.collapsed h1,
+header.collapsed #search-bar,
+header.collapsed #filter-panel {
+  display: none;
+}
+
 h1 {
   font-family: 'Pirata One', serif;
   font-size: 1.7rem;
