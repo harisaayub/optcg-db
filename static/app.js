@@ -737,19 +737,33 @@ function buildLeaderDropdown(query) {
 function init() {
   const headerEl = document.querySelector('header');
   let headerCollapsed = false;
-  let lastScrollY = window.scrollY;
+
+  // Collapse when scrolling down past threshold.
   window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    if (!headerCollapsed && y > 120) {
+    if (!headerCollapsed && window.scrollY > 120) {
       headerCollapsed = true;
       headerEl.classList.add('collapsed');
-    } else if (headerCollapsed && y <= 1 && y < lastScrollY) {
-      // Only re-open when actively scrolling upward to the very top,
-      // not from a layout shift caused by the collapse itself.
+    }
+  }, { passive: true });
+
+  function expandHeader() {
+    if (headerCollapsed && window.scrollY === 0) {
       headerCollapsed = false;
       headerEl.classList.remove('collapsed');
     }
-    lastScrollY = y;
+  }
+
+  // Expand only on an intentional upward gesture while already at the top.
+  window.addEventListener('wheel', e => {
+    if (e.deltaY < 0) expandHeader();
+  }, { passive: true });
+
+  let touchStartY = 0;
+  window.addEventListener('touchstart', e => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchmove', e => {
+    if (e.touches[0].clientY > touchStartY + 10) expandHeader();
   }, { passive: true });
 
 // Text inputs fire search only on Enter or the Search button, not on every keystroke.
