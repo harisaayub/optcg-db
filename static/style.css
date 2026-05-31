@@ -70,41 +70,58 @@ header {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  transition: padding 0.45s ease, gap 0.45s ease;
 }
 
-/* Slim expand-hint bar — hidden when expanded, shown when collapsed */
+/* Slim clickable expand bar — always in DOM, height-animated */
 #collapse-bar {
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: height 0.22s ease, opacity 0.18s ease;
-  cursor: default;
+  cursor: pointer;
   color: var(--text-dim);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
+  transition: height 0.45s ease, opacity 0.35s ease;
+  flex-shrink: 0;
 }
 #collapse-bar::after {
-  content: '▼';
-  font-size: 0.6rem;
-  opacity: 0.5;
+  content: '▲  expand';
+  font-size: 0.62rem;
+  opacity: 0.55;
+  letter-spacing: 0.12em;
+}
+#collapse-bar:hover::after { opacity: 0.9; }
+
+/* h1 and search-bar animate out instead of snapping with display:none */
+h1, #search-bar {
+  overflow: hidden;
+  max-height: 120px;
+  opacity: 1;
+  transition: max-height 0.45s ease, opacity 0.35s ease, margin 0.45s ease;
 }
 
 header.collapsed {
-  padding: 0 1.5rem;
+  padding: 0.1rem 1.5rem;
   gap: 0;
 }
 header.collapsed #collapse-bar {
-  display: flex;
-  height: 22px;
+  height: 26px;
   opacity: 1;
 }
 header.collapsed h1,
-header.collapsed #search-bar,
+header.collapsed #search-bar {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
 header.collapsed #filter-panel {
-  display: none;
+  max-height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
 }
 
 h1 {
@@ -172,7 +189,7 @@ h1 {
   overflow: hidden;
   max-height: 700px;
   opacity: 1;
-  transition: max-height 0.28s ease, opacity 0.22s ease;
+  transition: max-height 0.45s ease, opacity 0.35s ease;
 }
 header.collapsed #filter-panel {
   max-height: 0;

@@ -753,7 +753,15 @@ function init() {
     }
   }
 
-  // Expand only on an intentional upward gesture while already at the top.
+  // Clicking the bar scrolls to top then expands.
+  document.getElementById('collapse-bar').addEventListener('click', () => {
+    if (!headerCollapsed) return;
+    headerCollapsed = false;
+    headerEl.classList.remove('collapsed');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Expand on intentional upward gesture while already at the top.
   window.addEventListener('wheel', e => {
     if (e.deltaY < 0) expandHeader();
   }, { passive: true });
