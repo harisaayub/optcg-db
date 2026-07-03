@@ -280,6 +280,100 @@ function renderCard(card, searchRegex) {
   return cardEl;
 }
 
+// ── URL state sync ────────────────────────────────────────────────────────────
+
+function pushStateToURL() {
+  const params = new URLSearchParams();
+
+  const q            = searchInput.value.trim();
+  const name         = document.getElementById('name-filter').value.trim();
+  const colors       = [...document.querySelectorAll('.color-btn.active')].map(b => b.dataset.color);
+  const types        = [...document.querySelectorAll('.type-btn.active')].map(b => b.dataset.type);
+  const series       = activeSeries();
+  const excRotated   = document.getElementById('exclude-rotated-btn').classList.contains('active');
+  const costMin      = document.getElementById('cost-min').value.trim();
+  const costMax      = document.getElementById('cost-max').value.trim();
+  const powerMin     = document.getElementById('power-min').value.trim();
+  const powerMax     = document.getElementById('power-max').value.trim();
+
+  if (q)             params.set('q',         q);
+  if (name)          params.set('name',      name);
+  if (colors.length) params.set('colors',    colors.join(','));
+  if (types.length)  params.set('types',     types.join(','));
+  if (series.length) params.set('series',    series.join(','));
+  if (excRotated)    params.set('rotated',   '1');
+  if (costMin)       params.set('cost_min',  costMin);
+  if (costMax)       params.set('cost_max',  costMax);
+  if (powerMin)      params.set('power_min', powerMin);
+  if (powerMax)      params.set('power_max', powerMax);
+
+  if (keywordFilter.includes.length) params.set('kw',    keywordFilter.includes.join(','));
+  if (keywordFilter.excludes.length) params.set('kw_ex', keywordFilter.excludes.join(','));
+  if (keywordFilter.mode === 'or' && keywordFilter.includes.length) params.set('kw_mode', 'or');
+
+  if (costFilter.includes.length) params.set('ecost',    costFilter.includes.join(','));
+  if (costFilter.excludes.length) params.set('ecost_ex', costFilter.excludes.join(','));
+  if (costFilter.mode === 'or' && costFilter.includes.length) params.set('ecost_mode', 'or');
+
+  if (setFilter.includes.length) params.set('sets',    setFilter.includes.join(','));
+  if (setFilter.excludes.length) params.set('sets_ex', setFilter.excludes.join(','));
+
+  const tagsInc = [], tagsExc = [];
+  tagStates.forEach((state, tag) => {
+    if (state === 'include') tagsInc.push(tag);
+    else if (state === 'exclude') tagsExc.push(tag);
+  });
+  if (tagsInc.length) params.set('tags',    tagsInc.join(','));
+  if (tagsExc.length) params.set('tags_ex', tagsExc.join(','));
+
+  if (selectedLeader?.card_id) params.set('leader', selectedLeader.card_id);
+
+  const qs = params.toString();
+  history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+}
+
+function restoreStaticURLState(params) {
+  if (!params.toString()) return;
+
+  if (params.has('q'))         searchInput.value                                    = params.get('q');
+  if (params.has('name'))      document.getElementById('name-filter').value         = params.get('name');
+  if (params.has('cost_min'))  document.getElementById('cost-min').value            = params.get('cost_min');
+  if (params.has('cost_max'))  document.getElementById('cost-max').value            = params.get('cost_max');
+  if (params.has('power_min')) document.getElementById('power-min').value           = params.get('power_min');
+  if (params.has('power_max')) document.getElementById('power-max').value           = params.get('power_max');
+  if (params.get('rotated') === '1') document.getElementById('exclude-rotated-btn').classList.add('active');
+
+  if (params.has('colors')) {
+    const colors = params.get('colors').split(',');
+    document.querySelectorAll('.color-btn').forEach(b => b.classList.toggle('active', colors.includes(b.dataset.color)));
+  }
+  if (params.has('types')) {
+    const types = params.get('types').split(',');
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', types.includes(b.dataset.type)));
+  }
+
+  if (params.has('kw'))    params.get('kw').split(',').filter(Boolean).forEach(v => keywordFilter.add(v, 'include'));
+  if (params.has('kw_ex')) params.get('kw_ex').split(',').filter(Boolean).forEach(v => keywordFilter.add(v, 'exclude'));
+  if (params.get('kw_mode') === 'or') {
+    keywordFilter.mode = 'or';
+    const btn = document.getElementById('keyword-mode-btn');
+    btn.textContent = 'ANY';
+    btn.classList.add('or-mode');
+  }
+
+  if (params.has('ecost'))    params.get('ecost').split(',').filter(Boolean).forEach(v => costFilter.add(v, 'include'));
+  if (params.has('ecost_ex')) params.get('ecost_ex').split(',').filter(Boolean).forEach(v => costFilter.add(v, 'exclude'));
+  if (params.get('ecost_mode') === 'or') {
+    costFilter.mode = 'or';
+    const btn = document.getElementById('cost-mode-btn');
+    btn.textContent = 'ANY';
+    btn.classList.add('or-mode');
+  }
+
+  if (params.has('sets'))    params.get('sets').split(',').filter(Boolean).forEach(v => setFilter.add(v, 'include'));
+  if (params.has('sets_ex')) params.get('sets_ex').split(',').filter(Boolean).forEach(v => setFilter.add(v, 'exclude'));
+}
+
 // ── Search ───────────────────────────────────────────────────────────────────
 
 function buildSearchParams() {
@@ -308,6 +402,8 @@ function showEmptyState(message) {
 }
 
 async function doSearch() {
+  pushStateToURL();
+
   const { q, name, colors, types, series, excludeRotated, costMin, costMax, powerMin, powerMax, tagsInclude, tagsExclude } = buildSearchParams();
 
   if (!q && !name && !colors.length && !types.length && keywordFilter.isEmpty() && costFilter.isEmpty()
@@ -631,7 +727,7 @@ function wireModeBtn(btnEl, filter) {
 // ── API loaders ──────────────────────────────────────────────────────────────
 
 // loadMeta fetches /api/meta once to populate sets, keywords, and types.
-function loadMeta() {
+function loadMeta(urlParams) {
   fetch(`${API_BASE}/api/meta`).then(r => r.json()).then(({ sets, keywords, types, costs }) => {
     // Keywords and costs — populate chip filter dropdowns
     keywordFilter.setItems(keywords);
@@ -670,13 +766,41 @@ function loadMeta() {
         btn.style.display = btn.dataset.name.toLowerCase().includes(q) ? '' : 'none';
       });
     });
+
+    // Restore series + tags from URL (these buttons are created dynamically so must happen here)
+    if (urlParams && urlParams.has('series')) {
+      const seriesFromUrl = urlParams.get('series').split(',');
+      document.querySelectorAll('#series-btns .filter-btn').forEach(btn => {
+        if (seriesFromUrl.includes(btn.dataset.series)) btn.classList.add('active');
+      });
+    }
+    if (urlParams && (urlParams.has('tags') || urlParams.has('tags_ex'))) {
+      const tagsInc = urlParams.has('tags')    ? urlParams.get('tags').split(',').filter(Boolean)    : [];
+      const tagsExc = urlParams.has('tags_ex') ? urlParams.get('tags_ex').split(',').filter(Boolean) : [];
+      document.querySelectorAll('.tag-btn').forEach(btn => {
+        const n = btn.dataset.name;
+        if (tagsInc.includes(n))      { tagStates.set(n, 'include'); btn.className = 'tag-btn include'; }
+        else if (tagsExc.includes(n)) { tagStates.set(n, 'exclude'); btn.className = 'tag-btn exclude'; }
+      });
+    }
+
+    if (urlParams && urlParams.toString()) doSearch();
   });
 }
 
-function loadLeaders() {
+function loadLeaders(urlParams) {
   fetch(`${API_BASE}/api/leaders`)
     .then(r => r.json())
-    .then(leaders => { allLeaders = leaders; });
+    .then(leaders => {
+      allLeaders = leaders;
+      if (urlParams && urlParams.has('leader')) {
+        const leader = leaders.find(l => l.card_id === urlParams.get('leader'));
+        if (leader) {
+          document.getElementById('leader-input').value = `${leader.card_id}  ${leader.name}`;
+          selectedLeader = { card_id: leader.card_id, name: leader.name, types: leader.types || [], colors: leader.colors || [] };
+        }
+      }
+    });
 }
 
 function positionLeaderDropdown() {
@@ -719,7 +843,7 @@ function buildLeaderDropdown(query) {
     item.addEventListener('mousedown', e => e.preventDefault()); // keep focus on input
     item.addEventListener('click', () => {
       document.getElementById('leader-input').value = `${leader.card_id}  ${leader.name}`;
-      selectedLeader = { name: leader.name, types: leader.types || [], colors: leader.colors || [] };
+      selectedLeader = { card_id: leader.card_id, name: leader.name, types: leader.types || [], colors: leader.colors || [] };
       dropdown.hidden = true;
       applyLeaderColors(leader.colors || []);
       doSearch();
@@ -839,8 +963,10 @@ function init() {
     if (!leaderDropdown.hidden) positionLeaderDropdown();
   });
 
-  loadMeta();
-  loadLeaders();
+  const urlParams = new URLSearchParams(location.search);
+  restoreStaticURLState(urlParams);
+  loadMeta(urlParams);
+  loadLeaders(urlParams);
 }
 
 init();
